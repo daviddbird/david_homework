@@ -1,0 +1,182 @@
+---
+title: "Connections Homework"
+output: html_notebook
+---
+
+# Local PostgreSQL connections
+
+Create a local PostgreSQL database called `westling`
+** Done.**
+
+See the `wrestling` database from the file `wrestling.sql` using the `psql` 
+PostgreSQL command line interface.
+** Done.**
+
+```{r}
+library(keyring)
+keyring_unlock(keyring = "local1")
+username <- key_get("postgresql_username", keyring = "local1")
+password <- key_get("postgresql_password", keyring = "local1")
+keyring_lock(keyring = "local1")
+
+library(RPostgreSQL)
+
+
+my_db_connection <- dbConnect(drv = PostgreSQL(max.con = 2), user = username, password = password, dbname = "wrestling", host = "localhost")
+```
+
+Create a local connection to the local `wrestling` database from R.
+Don't forget to lock all the keyrings you use.
+Pass the argument `max.con = 2` to `PostgreSQL()' to make sure yuo don't have too many simultaneous connections. We'll ne setting up a local connection and a remote
+connection, hence '2'.
+Remember to add a separate 'disconnect' block of code. We'll write queries
+between the 'connect' and 'disconnect' blocks.
+
+dbDisconnect(conn = my_db_connection)
+
+```{r}
+
+```
+
+Using the R connection you just created, write and execute a SQL query to return
+all the wrestlers in the `westlers` table.
+
+```{r}
+dbGetQuery(my_db_connection, 
+            "SELECT * FROM wrestlers"
+           )
+```
+
+Explore the columns stored in the table. State which data type you think each
+column stores.
+```{r}
+# id = int = INT
+# born = chr = VARCHAR
+# name = chr = VARCHAR
+# gender = chr = VARCHAR
+# total_matches = int = INT
+```
+
+Extensions
+```{r}
+dbGetQuery(my_db_connection, 
+            "SELECT * FROM wrestlers"
+           )
+```
+
+
+# Remote PostgreSQL connections
+
+Store the credentions above in appropriately named keys in the `remote` keyring.
+
+Use your credentials to establish a comnnection from R to the remote database.
+```{r}
+
+```
+
+Remember to lock keyrings and write appropriate code to close database 
+connections as before.
+
+Using the R connection, write and execute a query to return all the wrestlers 
+from the `wrestlers` table.
+```{r}
+
+```
+
+# Extensions
+
+Return to using your connection to the local `wrestlers` database. Write and run queries to solve the following more difficult problems.
+
+Return all the datails for any wrestlers in the United Kingdom.
+```{r}
+dbGetQuery(my_db_connection, 
+    "SELECT *
+    FROM wrestlers
+    WHERE born IN ('United Kingdom')"
+)
+```
+
+Get the names of all Japanese wrestlers who have appeared in 40 or more matches.
+```{r}
+dbGetQuery(my_db_connection, 
+    "SELECT *
+    FROM wrestlers
+    WHERE born IN ('Japan') 
+    AND total_matches >= 40 "
+)
+```
+
+Find the wrestlers who have won between 50% and 60% of their matches.
+```{r}
+dbGetQuery(my_db_connection, 
+    "SELECT *
+    FROM wrestlers
+    WHERE win_percent >= 50 AND win_percent <= 60 "
+)
+```
+
+Find all the wrestlers with names beginning with X.
+```{r}
+dbGetQuery(my_db_connection, 
+    "SELECT *
+    FROM wrestlers
+    WHERE name ILIKE 'x%'"
+)
+```
+
+Find all wrestlers who were born in countries beginning with the letter "I". Try
+this using `IN` (there are 9 countries) and using a wildcard comparison.
+
+```{r}
+dbGetQuery(my_db_connection, 
+    "SELECT *
+    FROM wrestlers
+    WHERE born ILIKE 'I%'"
+)
+```
+
+Find all the wrestlers who were **not** born in countries beginning with the 
+letter "I".
+
+```{r}
+dbGetQuery(my_db_connection, 
+    "SELECT *
+    FROM wrestlers
+    WHERE born NOT LIKE 'I%'"
+)
+```
+
+```{r}
+# disconnection string to run when finished with the db
+dbDisconnect(conn = my_db_connection)
+```
+
+
+# Remote PostgreSQL connections
+
+```{r}
+library(keyring)
+keyring_unlock(keyring = "remote")
+username <- key_get("postgresql_username", keyring = "remote")
+password <- key_get("postgresql_password", keyring = "remote")
+keyring_lock(keyring = "remote")
+
+library(RPostgreSQL)
+
+
+remote_db_connection <- dbConnect(drv = PostgreSQL(max.con = 2), user = username, password = password, dbname = "mvhbdgdk", host = "manny.db.elephantsql.com")
+```
+
+
+```{r}
+dbGetQuery(remote_db_connection, 
+            "SELECT * FROM wrestlers"
+           )
+```
+
+
+```{r}
+# disconnection string to run when finished with the db
+dbDisconnect(conn = remote_db_connection)
+```
+

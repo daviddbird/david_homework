@@ -1,0 +1,125 @@
+---
+title: "Homework"
+output: html_notebook
+---
+
+Notes
+http://www.omdbapi.com/?apikey=[yourkey]&
+
+apikey = "your key"
+i = A valid IMDb ID (e.g. tt1285016)
+t = Movie title to search for
+
+```{r}
+library(httr)
+library(jsonlite)
+library(purrr)
+
+# file with omd_api_key as the name of the actual key.
+# source puts this in to the environment.
+source('keys.R')
+# this is the url of the site - the top part of it.
+url <- "http://www.omdbapi.com/"
+```
+
+
+
+```{r}
+# the elements here are created as a function
+# the variable is declared as "id"
+# the query parameters are defined as a list containing "apikey" and "i".
+# these are the names the api requires.
+# 
+get_by_id <- function(id){
+  query_params <- list(
+    apikey = omd_api_key,
+    i      = id
+  )
+
+  response <- GET(url, query = query_params)
+
+  content(response)
+}
+```
+
+```{r}
+# here the ids are defined
+ids <- c(
+  "tt0232500",
+  "tt0322259",
+  "tt0463985",
+  "tt1013752",
+  "tt1596343",
+  "tt0110074"
+)
+```
+
+
+```{r}
+# here the above two elements are put together
+# the map function is used
+results <- map(ids, get_by_id)
+```
+
+```{r}
+# this is creating a json file using the results defined in the above step
+write_json(results, 'film_info.json', auto_unbox = TRUE, pretty = TRUE)
+```
+
+
+```{r}
+# map_chr is ued to create imdb_ratings object
+imdb_ratings <- map_chr(results, 'imdbRating')
+# converting from chr to numeric to use the mean function.
+mean(as.numeric(imdb_ratings))
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```{r}
+response <- GET("http://www.omdbapi.com/?apikey=78207016&?t=Hudsucker+Proxy?")
+http_status(response)
+```
+
+```{r}
+content(response)
+```
+
+
+
+```{r}
+my_key = readLines("keys.R")
+response <- GET("http://www.omdbapi.com/?apikey=key(my_key)&?s=married+to+the+mob")
+http_status(response)
+```
+
+
+query = list(gender = "female", isAlive = TRUE))
+
+
+```{r}
+query <- "http://www.omdbapi.com/?apikey=78207016&?t=Hudsucker+Proxy?"
+
+out <- GET(url = query)
+
+http_status(out)
+```
+
+```{r}
+content(out)
+```
+
