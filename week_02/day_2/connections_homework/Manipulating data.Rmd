@@ -1,0 +1,281 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(keyring)
+keyring_unlock(keyring = "local1")
+username <- key_get("postgresql_username", keyring = "local1")
+password <- key_get("postgresql_password", keyring = "local1")
+keyring_lock(keyring = "local1")
+
+library(RPostgreSQL)
+
+db_connect <- dbConnect(drv = PostgreSQL(max.con = 1), user = username, password = password, dbname = "omni_employees", host = "localhost")
+```
+
+
+```{r}
+dbGetQuery(db_connect, "
+           SELECT id, first_name, last_name, CONCAT(first_name, ' ', last_name)
+           AS full_name
+           FROM employees
+           WHERE first_name IS NOT NULL AND last_name IS NOT NULL")
+``` 
+
+```{r}
+dbGetQuery(db_connect, "
+           SELECT DISTINCT(department)
+           FROM employees
+           ")
+``` 
+
+
+```{r}
+dbGetQuery(db_connect, "
+           SELECT DISTINCT(country)
+           FROM employees
+           ")
+```
+
+```{r}
+dbGetQuery(db_connect, "
+           SELECT *
+           FROM employees
+           WHERE EXTRACT(YEAR FROM start_date) = 2001
+           ")
+```
+
+```{r}
+dbGetQuery(db_connect, "
+           SELECT COUNT(*)
+           FROM employees
+           WHERE EXTRACT(YEAR FROM start_date) = 2001
+           ")
+```
+
+```{r}
+dbGetQuery(db_connect, "
+           SELECT COUNT(id)
+           FROM employees
+           WHERE EXTRACT(YEAR FROM start_date) = 2001
+           ")
+```
+
+```{r}
+dbGetQuery(db_connect, "
+           SELECT MAX(salary) 
+           FROM employees
+           ")
+```
+
+```{r}
+dbGetQuery(db_connect, "
+           SELECT MIN(salary) 
+           FROM employees
+           ")
+```
+
+combine with col aliases
+```{r}
+dbGetQuery(db_connect, "
+           SELECT MIN(salary)  As min_salary, MAX(salary) as max_salary
+           FROM employees
+           ")
+```
+
+
+```{r}
+dbGetQuery(db_connect, "
+           SELECT AVG(salary) 
+           FROM employees
+           WHERE department = 'Human Resources'
+           ")
+```
+
+```{r}
+dbGetQuery(db_connect, "
+           SELECT SUM(salary) 
+           FROM employees
+           WHERE EXTRACT(YEAR FROM start_date) = 2018
+           ")
+```
+
+```{r}
+dbGetQuery(db_connect, "
+           SELECT *
+           FROM employees
+           WHERE salary IS NOT NULL
+           ORDER BY salary ASC
+           LIMIT 1
+           ")
+```
+
+
+```{r}
+dbGetQuery(db_connect, "
+           SELECT *
+           FROM employees
+           WHERE salary IS NOT NULL
+           ORDER BY salary DESC
+           LIMIT 1
+           ")
+```
+
+
+```{r}
+dbGetQuery(db_connect, "
+           SELECT *
+           FROM employees
+           ORDER BY salary DESC NULLS LAST
+           LIMIT 1
+           ")
+```
+
+```{r}
+dbGetQuery(db_connect, "
+           SELECT *
+           FROM employees
+           ORDER BY fte_hours DESC NULLS LAST, last_name ASC NULLS LAST
+           ")
+```
+
+```{r}
+dbGetQuery(db_connect, "
+           SELECT *
+           FROM employees
+           ORDER BY start_date ASC NULLS LAST
+           LIMIT 1
+           ")
+```
+
+
+```{r}
+dbGetQuery(db_connect, "
+           SELECT *
+           FROM employees
+           WHERE country = 'Libya'
+           ORDER BY salary DESC NULLS LAST
+           LIMIT 1
+           ")
+```
+
+
+
+```{r}
+dbGetQuery(db_connect, "
+           SELECT department, COUNT(id) as number_employees
+           FROM employees
+           GROUP BY department
+           ")
+```
+
+
+```{r}
+dbGetQuery(db_connect, "
+           SELECT MAX(salary) AS max_salary, department, COUNT(id) as number_employees
+           FROM employees
+           GROUP BY department
+           ")
+```
+
+
+```{r}
+dbGetQuery(db_connect, "
+           SELECT country, COUNT(id) AS num_employees
+           FROM employees
+           GROUP BY country
+           ")
+```
+
+```{r}
+dbGetQuery(db_connect, "
+           SELECT country, COUNT(id) AS num_ft_employees
+           FROM employees
+           WHERE fte_hours = 1
+           GROUP BY country
+           ")
+```
+
+
+```{r}
+dbGetQuery(db_connect, "
+           SELECT department, NOW()-MIN(start_date) AS longest_time_served
+           FROM employees
+           GROUP BY department
+           ")
+```
+
+```{r}
+dbGetQuery(db_connect, "
+           SELECT department, COUNT(id) as num_employees_pension
+           FROM employees
+           WHERE pension_enrol = TRUE
+           GROUP BY department
+           ")
+```
+
+```{r}
+dbGetQuery(db_connect, "
+           SELECT country, COUNT(id) as num_employees_no_first_name
+           FROM employees
+           WHERE first_name IS NULL
+           GROUP BY country
+           ")
+```
+
+```{r}
+dbGetQuery(db_connect, "
+           SELECT department, COUNT(id) AS num_fte_quarter_half
+           FROM employees
+           WHERE fte_hours IN (0.25, 0.5)
+           GROUP BY department
+           HAVING COUNT(id) >= 40
+           ")
+```
+
+```{r}
+dbGetQuery(db_connect, "
+           SELECT country, MIN(salary) AS min_salary
+           FROM employees
+           WHERE pension_enrol = TRUE
+           GROUP BY country
+           HAVING MIN(salary) < 21000
+           ")
+```
+
+
+```{r}
+dbGetQuery(db_connect, "
+           SELECT department, MIN(start_date) AS earliest_start_date_grade_1
+           FROM employees
+           WHERE grade = 1
+           GROUP BY department
+           HAVING MIN(start_date) < '1991-01-01'
+           ")
+```
+
+query within a query
+```{r}
+dbGetQuery(db_connect, "
+           SELECT *
+           FROM employees
+           WHERE country = 'Japan' AND salary > (SELECT AVG(salary) FROM employees)
+           ")
+```
+
+
+```{r}
+dbGetQuery(db_connect, "
+           SELECT *
+           FROM employees
+           WHERE country = 'Japan' AND salary > (SELECT AVG(salary) FROM employees)
+           ")
+```
+
+
+```{r}
+dbDisconnect(conn = my_db_connection)
+```
+

@@ -1,0 +1,257 @@
+---
+title: "SQL Lab"
+output: html_notebook
+---
+
+```{r}
+library(keyring)
+keyring_unlock(keyring = "local1")
+# should have used a name to specify the database
+# this will allow you to use the key for lots of
+# different databases
+# should keep work databases in a sperate keyring
+# if you have an error message look at keychain access on mac
+# you might need to give permission of it tobe used by R
+# alway check the variable names when you run this
+# as you can see these
+username <- key_get("postgresql_username", keyring = "local1")
+password <- key_get("postgresql_password", keyring = "local1")
+keyring_lock(keyring = "local1")
+
+library(RPostgreSQL)
+
+
+my_db_connection <- dbConnect(drv = PostgreSQL(max.con = 2), user = username, password = password, dbname = "omni_employees", host = "localhost")
+```
+
+
+```{r}
+dbGetQuery(my_db_connection, 
+            "SELECT * FROM committees"
+           )
+```
+
+```{r}
+dbGetQuery(my_db_connection, 
+            "SELECT * FROM employees_committees"
+           )
+```
+
+
+```{r}
+dbGetQuery(my_db_connection, 
+            "SELECT * FROM employees
+           ")
+```
+
+```{r}
+dbGetQuery(my_db_connection, 
+            "SELECT * FROM pay_details
+           ")
+```
+
+```{r}
+dbGetQuery(my_db_connection, 
+            "SELECT * FROM teams
+           ")
+```
+
+Find all the employees who work in the ‘Human Resources’ department.
+```{r}
+dbGetQuery(my_db_connection, "
+            SELECT * FROM employees
+            WHERE department = 'Human Resources'
+           ")
+```
+
+Get the first name, last name, and country of the employees who work in the ‘Legal’ department
+```{r}
+dbGetQuery(my_db_connection, "
+            SELECT first_name, last_name, country FROM employees
+            WHERE department = 'Legal'
+           ")
+```
+
+Count the number of employees based in Portugal.
+```{r}
+dbGetQuery(my_db_connection, "
+            SELECT COUNT(id)
+            FROM employees
+            WHERE country = 'Portugal'
+           ")
+```
+
+
+Count the number of employees based in either Portugal or Spain.
+```{r}
+dbGetQuery(my_db_connection, "
+            SELECT COUNT(id)
+            FROM employees
+            WHERE country = 'Portugal' OR country = 'Spain'
+           ")
+```
+
+Count the number of pay_details records lacking a local_account_no
+```{r}
+dbGetQuery(my_db_connection, "
+            SELECT COUNT(id)
+            FROM pay_details
+            WHERE local_account_no IS NULL
+           ")
+```
+
+Are there any pay_details record lacking both a local_account_no and iban number?
+```{r}
+dbGetQuery(my_db_connection, "
+            SELECT *
+            FROM pay_details
+            WHERE local_account_no IS NULL AND iban IS NULL
+           ")
+```
+
+Get a list of employees first names and last names ordered alphabetically by their last name (put any nulls last).
+
+```{r}
+dbGetQuery(my_db_connection, "
+            SELECT first_name, last_name
+            FROM employees
+            ORDER BY last_name ASC NULLS LAST
+           ")
+```
+
+Get a list of employees first names, last names and countries, ordered alphabetically first by their country and second by their last name (put any nulls last).
+```{r}
+dbGetQuery(my_db_connection, "
+            SELECT first_name, last_name, country
+            FROM employees
+            ORDER BY country ASC NULLS LAST, last_name ASC NULLS LAST
+           ")
+```
+
+Find the top ten highest paid employees in the corporation.
+```{r}
+dbGetQuery(my_db_connection, "
+            SELECT first_name, last_name, salary, country
+            FROM employees
+            ORDER BY salary DESC NULLS LAST
+            LIMIT 10
+           ")
+```
+
+Find the first name, last name and salary of the lowest paid of the employees in Hungary
+```{r}
+dbGetQuery(my_db_connection, "
+            SELECT first_name, last_name, salary, country
+            FROM employees
+            WHERE country = 'Hungary'
+            ORDER BY salary ASC NULLS LAST
+            LIMIT 1
+           ")
+```
+
+How many employees have a first name beginning with ‘F’?
+```{r}
+dbGetQuery(my_db_connection, "
+            SELECT COUNT(id)
+            FROM employees
+            WHERE first_name ILIKE 'F%'
+           ")
+```
+
+Find all the details of any employees with a ‘yahoo’ e-mail address?
+```{r}
+dbGetQuery(my_db_connection, "
+            SELECT *
+            FROM employees
+            WHERE email ILIKE '%yahoo%'
+           ")
+```
+
+
+Count the number of pension enrolled employees not based in either France or Germany.
+```{r}
+dbGetQuery(my_db_connection, "
+            SELECT COUNT(id)
+            FROM employees
+            WHERE pension_enrol = TRUE and country NOT LIKE 'France' 
+              OR country NOT LIKE 'Germany'
+           ")
+```
+
+```{r}
+dbGetQuery(my_db_connection, "
+            SELECT COUNT(id)
+            FROM employees
+            WHERE pension_enrol = TRUE AND country != 'France' 
+              OR country != 'Germany'
+           ")
+```
+
+Breakdown the numbers of employees enrolled, not enrolled and whose enrollment status is unknown in the corporation pension scheme.
+```{r}
+dbGetQuery(my_db_connection, "
+            SELECT COUNT(id), pension_enrol
+            FROM employees
+            GROUP BY (pension_enrol)
+           ")
+```
+
+What is the maximum salary among employees in the Engineering department who work 1.0 full-time equivalent hours?
+
+```{r}
+dbGetQuery(my_db_connection, "
+            SELECT max(salary)
+            FROM employees
+            WHERE department = 'Engineering' AND fte_hours = 1
+           ")
+```
+
+Obtain a count by department of the employees who started work with the corporation in 2003.
+```{r}
+dbGetQuery(my_db_connection, "
+            SELECT COUNT(department), department
+            FROM employees
+            WHERE EXTRACT(YEAR FROM start_date) = 2003
+            GROUP BY department
+           ")
+```
+
+# Extensions
+
+Show the average salary in any countries in which more than 30 employees are based. Order the list descending by average salary.
+
+```{r}
+dbGetQuery(my_db_connection, "
+            SELECT country, COUNT(id) AS number_employees, AVG(salary) AS avg_salary
+            FROM employees
+            GROUP BY country
+            HAVING COUNT(id) > 30
+            ORDER BY avg_salary DESC NULLS LAST
+           ")
+```
+
+Find the first name and last name of all employees who lack a local_tax_code.
+SELECT employees.*, pay_details.*
+```{r}
+dbGetQuery(my_db_connection, "
+            SELECT employees.first_name, employees.last_name, pay_details.local_tax_code
+            FROM employees INNER JOIN pay_details
+            ON employees.pay_detail_id = pay_details.id
+            WHERE local_tax_code IS NULL
+           ")
+```
+
+Find the first name, last name and team name of employees who are members of teams for which the charge cost is greater than 80. Order the employees alphabetically by last name.
+
+```{r}
+dbGetQuery(my_db_connection, "
+            SELECT employees.first_name, employees.last_name, teams.name
+            FROM employees INNER JOIN teams
+            ON employees.team_id = teams.id
+            WHERE 
+           ")
+```
+
+
+
+

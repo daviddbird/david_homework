@@ -1,0 +1,85 @@
+---
+title: "Carbanak Bank Robbery"
+output: html_notebook
+---
+
+  
+MVP
+
+### What is Spear Phishing?
+  **Spear phishing** is a targeted form of phishing which uses faked 
+  correspondence from friends, work colleagues or other associates to get 
+  someone to unwittingly download a piece of malware or to release sensitive 
+  information. The first point of contact with a potential victim is usually 
+  through email or social media.
+  
+  In a spear phishing attempt, a perpetrator needs to know some detail about
+  the victim. Using these details, the faudster aims to instill trust in the 
+  victim and get as far as possible with the scam.
+  
+### What is Malware?
+  The goal of malware programs is to access sensitive data and copy it. Some 
+  malwares can autonomously copy data and send it to a specfic port or server
+  that an attacker can then use to steal information.
+
+  a) **Ransomware** - designed to encrypt the victim's storage drives. Payment is
+  then requested in return for the encryption key.
+  b) **Trojans** - This is any piece of malware that pretents to be a legitimate
+  program to trick victims into installing to on systems.
+  c) **Worms** - Programs that can self-replicate and spread through a variety of
+  means - such as email. Once on a system, a worm will search for some form of 
+  contacts database or file sharing system and send itself out as an attachment.
+
+### How did the malware end up on the employees computers?
+  An employee must have clicked on a link on a web-site or triggered something
+  to install when opening an email attachment.
+  
+### What could the employees have done to prevent malware beinhg installed?
+  First of all, staff should have had some awareness training by their IS team
+  to highligh the dangers of opening email attachments from people you don't
+  know or were not expecting email attachments from.
+  
+  IS could take away admin rights on computers to help prevent software being 
+  installed by employees - but regular training and awareness sessions to keep 
+  staff up-to-date with new threats and IT measure would be the most effective
+  combination. If vulnerabilities in MS Word were used to install the malware, 
+  could the bank's IS team have made sure that MS Office was patched / 
+  updated to remove this issue? Could email attachments be blocked or 
+  quarentined to prevent them appearing in email in-boxes?
+  
+  
+## Extension
+
+### 1. Malware (mentioned above) - and the following:
+  
+### 2. Unpatched Security Vulnerabilities
+  Many threats rely on old security vulnerabilities to work. With so many 
+  malwares looking to take advantage of this - one of the biggest risk an
+  organisation can take is failing to patch those vulnerabilities once they
+  are discovered.
+
+
+### 3. Phishing (Social Engineering) Attacks
+  In a phishing attack, the attacker attempts to trick an employee in the
+  organisation into giving away sensitive data and account credentials - or 
+  into downloding malware. The basic goal is to exploit and organisation's
+  employees to bypass one or more security layers - so they can access data
+  more easily.
+  
+### 4. IoT devices
+  The Internet of Things (IoT) covers many smart devices such as WiFi capable
+  printers, manufacturing robots refrigerators and countless other machines.
+  The issue with these devices is hat they can be hijacked by attackers to 
+  form slaved networks of compromised devices to carry out further attacks.
+  
+### 5. An organisation's employees
+  The biggest vulnerability in any oranisation is its own employees. Employees
+  may abuse their access privileges for personal gain. Or, an employee may 
+  click on the wrong link in an email, download the wrong file from an online 
+  site or give the wrong person their account credentials - allowing attackers 
+  easy access to systems.
+  
+
+  
+
+  

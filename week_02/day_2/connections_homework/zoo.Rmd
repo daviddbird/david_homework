@@ -1,0 +1,130 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(keyring)
+keyring_unlock(keyring = "local1")
+# should have used a name to specify the database
+# this will allow you to use the key for lots of
+# different databases
+# should keep work databases in a sperate keyring
+# if you have an error message look at keychain access on mac
+# you might need to give permission of it tobe used by R
+# alway check the variable names when you run this
+# as you can see these
+username <- key_get("postgresql_username", keyring = "local1")
+password <- key_get("postgresql_password", keyring = "local1")
+keyring_lock(keyring = "local1")
+
+library(RPostgreSQL)
+
+
+db_connection <- dbConnect(drv = PostgreSQL(max.con = 2), user = username, password = password, dbname = "zoo", host = "localhost")
+rm(list = c("username", "password"))
+```
+
+```{r}
+dbGetQuery(db_connection, "
+           SELECT * 
+           FROM diets
+           ")
+```
+
+```{r}
+dbGetQuery(db_connection, "
+           SELECT animals.*, diets.*
+           FROM animals INNER JOIN diets
+           ON animals.diet_id = diets.id
+           ")
+```
+
+
+```{r}
+dbGetQuery(db_connection, "
+           SELECT a.name, a.species, d.diet_type
+           FROM animals AS a INNER JOIN diets AS d
+           ON a.diet_id = d.id
+           ")
+```
+
+
+```{r}
+dbGetQuery(db_connection, "
+           SELECT a.name, a.species, a.age, d.diet_type
+           FROM animals AS a INNER JOIN diets AS d
+           ON a.diet_id = d.id
+           WHERE a.age > 4
+           ")
+```
+
+```{r}
+dbGetQuery(db_connection, "
+           SELECT d.diet_type, COUNT(a.id)
+           FROM animals AS a INNER JOIN diets AS d
+           ON a.diet_id = d.id
+           GROUP BY d.diet_type
+           ")
+```
+
+```{r}
+dbGetQuery(db_connection, "
+           SELECT a.name, a.species, a.age, d.diet_type
+           FROM animals AS a INNER JOIN diets AS d
+           ON a.diet_id = d.id
+           WHERE d.diet_type = 'herbivore'
+           ")
+```
+
+```{r}
+dbGetQuery(db_connection, "
+           SELECT a.*, d.*
+           FROM animals AS a LEFT JOIN diets AS d
+           ON a.diet_id = d.id
+           ")
+```
+
+everything from b side appear once even if there is no match
+```{r}
+dbGetQuery(db_connection, "
+           SELECT a.*, d.*
+           FROM animals AS a RIGHT JOIN diets AS d
+           ON a.diet_id = d.id
+           ")
+```
+
+```{r}
+dbGetQuery(db_connection, "
+           SELECT d.diet_type, COUNT(a.id) AS num_animals
+           FROM animals AS a RIGHT JOIN diets AS d
+           ON a.diet_id = d.id
+           GROUP BY d.diet_type
+           ")
+```
+
+
+```{r}
+dbGetQuery(db_connection, "
+           SELECT * FROM care_schedule
+           ")
+```
+
+
+```{r}
+dbGetQuery(db_connection, "
+           SELECT a.name AS animal_name, cs.day, k.name AS keeper_name
+           FROM (animals AS a INNER JOIN care_schedule AS cs 
+           ON a.id = cs.animal_id)
+           INNER JOIN keepers AS k
+           ON k.id = cs.keeper_id
+           WHERE a.name = 'Ernest'
+           ORDER BY cs.day ASC
+           ")
+```
+
+
+```{r}
+dbDisconnect(db_connect)
+```
+
