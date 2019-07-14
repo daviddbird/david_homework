@@ -1784,16 +1784,30 @@ The following object is masked from ‘package:jsonlite’:
 
     flatten</code></pre>
 <!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc291cmNlKCdrZXlzLlInKVxudXJsIDwtIFwiaHR0cDovL3d3dy5vbWRiYXBpLmNvbS9cIlxuYGBgIn0= -->
-<pre class="r"><code>source('keys.R')
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShrZXlyaW5nKVxuXG4jIGZpbGUgd2l0aCBvbWRfYXBpX2tleSBhcyB0aGUgbmFtZSBvZiB0aGUgYWN0dWFsIGtleS5cbiMgc291cmNlIHB1dHMgdGhpcyBpbiB0byB0aGUgZW52aXJvbm1lbnQuXG4jIHNvdXJjZSgna2V5cy5SJylcbiMgdGhpcyBpcyB0aGUgdXJsIG9mIHRoZSBzaXRlIC0gdGhlIHRvcCBwYXJ0IG9mIGl0LlxudXJsIDwtIFwiaHR0cDovL3d3dy5vbWRiYXBpLmNvbS9cIlxuYGBgIn0= -->
+<pre class="r"><code>library(keyring)
+
+# file with omd_api_key as the name of the actual key.
+# source puts this in to the environment.
+# source('keys.R')
+# this is the url of the site - the top part of it.
 url &lt;- &quot;http://www.omdbapi.com/&quot;</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZ2V0X2J5X2lkIDwtIGZ1bmN0aW9uKGlkKXtcbiAgcXVlcnlfcGFyYW1zIDwtIGxpc3QoXG4gICAgYXBpa2V5ID0gb21kX2FwaV9rZXksXG4gICAgaSAgICAgID0gaWRcbiAgKVxuXG4gIHJlc3BvbnNlIDwtIEdFVCh1cmwsIHF1ZXJ5ID0gcXVlcnlfcGFyYW1zKVxuXG4gIGNvbnRlbnQocmVzcG9uc2UpXG59XG5gYGAifQ== -->
-<pre class="r"><code>get_by_id &lt;- function(id){
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxua2V5cmluZ191bmxvY2soa2V5cmluZyA9IFwiYXBpXCIpXG5vbWRfYXBpX2tleSA8LSBrZXlfZ2V0KFwib21kX2FwaV9rZXlcIiwga2V5cmluZyA9IFwiYXBpXCIpXG5rZXlyaW5nX2xvY2soa2V5cmluZyA9IFwiYXBpXCIpXG5cbiMgdGhlIGVsZW1lbnRzIGhlcmUgYXJlIGNyZWF0ZWQgYXMgYSBmdW5jdGlvblxuIyB0aGUgdmFyaWFibGUgaXMgZGVjbGFyZWQgYXMgXCJpZFwiXG4jIHRoZSBxdWVyeSBwYXJhbWV0ZXJzIGFyZSBkZWZpbmVkIGFzIGEgbGlzdCBjb250YWluaW5nIFwiYXBpa2V5XCIgYW5kIFwiaVwiLlxuIyB0aGVzZSBhcmUgdGhlIG5hbWVzIHRoZSBhcGkgcmVxdWlyZXMuXG4jIFxuZ2V0X2J5X2lkIDwtIGZ1bmN0aW9uKGlkKXtcbiAgcXVlcnlfcGFyYW1zIDwtIGxpc3QoXG4gICAgYXBpa2V5ID0gb21kX2FwaV9rZXksXG4gICAgaSAgICAgID0gaWRcbiAgKVxuXG4gIHJlc3BvbnNlIDwtIEdFVCh1cmwsIHF1ZXJ5ID0gcXVlcnlfcGFyYW1zKVxuXG4gIGNvbnRlbnQocmVzcG9uc2UpXG59XG5gYGAifQ== -->
+<pre class="r"><code>keyring_unlock(keyring = &quot;api&quot;)
+omd_api_key &lt;- key_get(&quot;omd_api_key&quot;, keyring = &quot;api&quot;)
+keyring_lock(keyring = &quot;api&quot;)
+
+# the elements here are created as a function
+# the variable is declared as &quot;id&quot;
+# the query parameters are defined as a list containing &quot;apikey&quot; and &quot;i&quot;.
+# these are the names the api requires.
+# 
+get_by_id &lt;- function(id){
   query_params &lt;- list(
     apikey = omd_api_key,
     i      = id
@@ -1852,95 +1866,8 @@ mean(as.numeric(imdb_ratings))</code></pre>
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucmVzcG9uc2UgPC0gR0VUKFwiaHR0cDovL3d3dy5vbWRiYXBpLmNvbS8/YXBpa2V5PTc4MjA3MDE2Jj90PUh1ZHN1Y2tlcitQcm94eT9cIilcbmh0dHBfc3RhdHVzKHJlc3BvbnNlKVxuYGBgIn0= -->
-<pre class="r"><code>response &lt;- GET(&quot;http://www.omdbapi.com/?apikey=78207016&amp;?t=Hudsucker+Proxy?&quot;)
-http_status(response)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiJGNhdGVnb3J5XG5bMV0gXCJTdWNjZXNzXCJcblxuJHJlYXNvblxuWzFdIFwiT0tcIlxuXG4kbWVzc2FnZVxuWzFdIFwiU3VjY2VzczogKDIwMCkgT0tcIlxuIn0= -->
-<pre><code>$category
-[1] &quot;Success&quot;
 
-$reason
-[1] &quot;OK&quot;
-
-$message
-[1] &quot;Success: (200) OK&quot;</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY29udGVudChyZXNwb25zZSlcbmBgYCJ9 -->
-<pre class="r"><code>content(response)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiJFJlc3BvbnNlXG5bMV0gXCJGYWxzZVwiXG5cbiRFcnJvclxuWzFdIFwiU29tZXRoaW5nIHdlbnQgd3JvbmcuXCJcbiJ9 -->
-<pre><code>$Response
-[1] &quot;False&quot;
-
-$Error
-[1] &quot;Something went wrong.&quot;</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubXlfa2V5ID0gcmVhZExpbmVzKFwia2V5cy5SXCIpXG5yZXNwb25zZSA8LSBHRVQoXCJodHRwOi8vd3d3Lm9tZGJhcGkuY29tLz9hcGlrZXk9a2V5KG15X2tleSkmP3M9bWFycmllZCt0byt0aGUrbW9iXCIpXG5odHRwX3N0YXR1cyhyZXNwb25zZSlcbmBgYCJ9 -->
-<pre class="r"><code>my_key = readLines(&quot;keys.R&quot;)
-response &lt;- GET(&quot;http://www.omdbapi.com/?apikey=key(my_key)&amp;?s=married+to+the+mob&quot;)
-http_status(response)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiJGNhdGVnb3J5XG5bMV0gXCJDbGllbnQgZXJyb3JcIlxuXG4kcmVhc29uXG5bMV0gXCJVbmF1dGhvcml6ZWRcIlxuXG4kbWVzc2FnZVxuWzFdIFwiQ2xpZW50IGVycm9yOiAoNDAxKSBVbmF1dGhvcml6ZWRcIlxuIn0= -->
-<pre><code>$category
-[1] &quot;Client error&quot;
-
-$reason
-[1] &quot;Unauthorized&quot;
-
-$message
-[1] &quot;Client error: (401) Unauthorized&quot;</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>query = list(gender = “female”, isAlive = TRUE))</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucXVlcnkgPC0gXCJodHRwOi8vd3d3Lm9tZGJhcGkuY29tLz9hcGlrZXk9NzgyMDcwMTYmP3Q9SHVkc3Vja2VyK1Byb3h5P1wiXG5cbm91dCA8LSBHRVQodXJsID0gcXVlcnkpXG5cbmh0dHBfc3RhdHVzKG91dClcbmBgYCJ9 -->
-<pre class="r"><code>query &lt;- &quot;http://www.omdbapi.com/?apikey=78207016&amp;?t=Hudsucker+Proxy?&quot;
-
-out &lt;- GET(url = query)
-
-http_status(out)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiJGNhdGVnb3J5XG5bMV0gXCJTdWNjZXNzXCJcblxuJHJlYXNvblxuWzFdIFwiT0tcIlxuXG4kbWVzc2FnZVxuWzFdIFwiU3VjY2VzczogKDIwMCkgT0tcIlxuIn0= -->
-<pre><code>$category
-[1] &quot;Success&quot;
-
-$reason
-[1] &quot;OK&quot;
-
-$message
-[1] &quot;Success: (200) OK&quot;</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY29udGVudChvdXQpXG5gYGAifQ== -->
-<pre class="r"><code>content(out)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiJFJlc3BvbnNlXG5bMV0gXCJGYWxzZVwiXG5cbiRFcnJvclxuWzFdIFwiU29tZXRoaW5nIHdlbnQgd3JvbmcuXCJcbiJ9 -->
-<pre><code>$Response
-[1] &quot;False&quot;
-
-$Error
-[1] &quot;Something went wrong.&quot;</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<!-- rnb-text-end -->
-
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiSG9tZXdvcmsiCm91dHB1dDogaHRtbF9ub3RlYm9vawotLS0KCk5vdGVzCmh0dHA6Ly93d3cub21kYmFwaS5jb20vP2FwaWtleT1beW91cmtleV0mCgphcGlrZXkgPSAieW91ciBrZXkiCmkgPSBBIHZhbGlkIElNRGIgSUQgKGUuZy4gdHQxMjg1MDE2KQp0ID0gTW92aWUgdGl0bGUgdG8gc2VhcmNoIGZvcgoKYGBge3J9CmxpYnJhcnkoaHR0cikKbGlicmFyeShqc29ubGl0ZSkKbGlicmFyeShwdXJycikKCiMgZmlsZSB3aXRoIG9tZF9hcGlfa2V5IGFzIHRoZSBuYW1lIG9mIHRoZSBhY3R1YWwga2V5LgojIHNvdXJjZSBwdXRzIHRoaXMgaW4gdG8gdGhlIGVudmlyb25tZW50Lgpzb3VyY2UoJ2tleXMuUicpCiMgdGhpcyBpcyB0aGUgdXJsIG9mIHRoZSBzaXRlIC0gdGhlIHRvcCBwYXJ0IG9mIGl0Lgp1cmwgPC0gImh0dHA6Ly93d3cub21kYmFwaS5jb20vIgpgYGAKCgoKYGBge3J9CiMgdGhlIGVsZW1lbnRzIGhlcmUgYXJlIGNyZWF0ZWQgYXMgYSBmdW5jdGlvbgojIHRoZSB2YXJpYWJsZSBpcyBkZWNsYXJlZCBhcyAiaWQiCiMgdGhlIHF1ZXJ5IHBhcmFtZXRlcnMgYXJlIGRlZmluZWQgYXMgYSBsaXN0IGNvbnRhaW5pbmcgImFwaWtleSIgYW5kICJpIi4KIyB0aGVzZSBhcmUgdGhlIG5hbWVzIHRoZSBhcGkgcmVxdWlyZXMuCiMgCmdldF9ieV9pZCA8LSBmdW5jdGlvbihpZCl7CiAgcXVlcnlfcGFyYW1zIDwtIGxpc3QoCiAgICBhcGlrZXkgPSBvbWRfYXBpX2tleSwKICAgIGkgICAgICA9IGlkCiAgKQoKICByZXNwb25zZSA8LSBHRVQodXJsLCBxdWVyeSA9IHF1ZXJ5X3BhcmFtcykKCiAgY29udGVudChyZXNwb25zZSkKfQpgYGAKCmBgYHtyfQojIGhlcmUgdGhlIGlkcyBhcmUgZGVmaW5lZAppZHMgPC0gYygKICAidHQwMjMyNTAwIiwKICAidHQwMzIyMjU5IiwKICAidHQwNDYzOTg1IiwKICAidHQxMDEzNzUyIiwKICAidHQxNTk2MzQzIiwKICAidHQwMTEwMDc0IgopCmBgYAoKCmBgYHtyfQojIGhlcmUgdGhlIGFib3ZlIHR3byBlbGVtZW50cyBhcmUgcHV0IHRvZ2V0aGVyCiMgdGhlIG1hcCBmdW5jdGlvbiBpcyB1c2VkCnJlc3VsdHMgPC0gbWFwKGlkcywgZ2V0X2J5X2lkKQpgYGAKCmBgYHtyfQojIHRoaXMgaXMgY3JlYXRpbmcgYSBqc29uIGZpbGUgdXNpbmcgdGhlIHJlc3VsdHMgZGVmaW5lZCBpbiB0aGUgYWJvdmUgc3RlcAp3cml0ZV9qc29uKHJlc3VsdHMsICdmaWxtX2luZm8uanNvbicsIGF1dG9fdW5ib3ggPSBUUlVFLCBwcmV0dHkgPSBUUlVFKQpgYGAKCgpgYGB7cn0KIyBtYXBfY2hyIGlzIHVlZCB0byBjcmVhdGUgaW1kYl9yYXRpbmdzIG9iamVjdAppbWRiX3JhdGluZ3MgPC0gbWFwX2NocihyZXN1bHRzLCAnaW1kYlJhdGluZycpCiMgY29udmVydGluZyBmcm9tIGNociB0byBudW1lcmljIHRvIHVzZSB0aGUgbWVhbiBmdW5jdGlvbi4KbWVhbihhcy5udW1lcmljKGltZGJfcmF0aW5ncykpCmBgYAoKCgoKCgoKCgoKCgoKCgoKCmBgYHtyfQpyZXNwb25zZSA8LSBHRVQoImh0dHA6Ly93d3cub21kYmFwaS5jb20vP2FwaWtleT03ODIwNzAxNiY/dD1IdWRzdWNrZXIrUHJveHk/IikKaHR0cF9zdGF0dXMocmVzcG9uc2UpCmBgYAoKYGBge3J9CmNvbnRlbnQocmVzcG9uc2UpCmBgYAoKCgpgYGB7cn0KbXlfa2V5ID0gcmVhZExpbmVzKCJrZXlzLlIiKQpyZXNwb25zZSA8LSBHRVQoImh0dHA6Ly93d3cub21kYmFwaS5jb20vP2FwaWtleT1rZXkobXlfa2V5KSY/cz1tYXJyaWVkK3RvK3RoZSttb2IiKQpodHRwX3N0YXR1cyhyZXNwb25zZSkKYGBgCgoKcXVlcnkgPSBsaXN0KGdlbmRlciA9ICJmZW1hbGUiLCBpc0FsaXZlID0gVFJVRSkpCgoKYGBge3J9CnF1ZXJ5IDwtICJodHRwOi8vd3d3Lm9tZGJhcGkuY29tLz9hcGlrZXk9NzgyMDcwMTYmP3Q9SHVkc3Vja2VyK1Byb3h5PyIKCm91dCA8LSBHRVQodXJsID0gcXVlcnkpCgpodHRwX3N0YXR1cyhvdXQpCmBgYAoKYGBge3J9CmNvbnRlbnQob3V0KQpgYGAKCg==</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiSG9tZXdvcmsiCm91dHB1dDogaHRtbF9ub3RlYm9vawotLS0KCk5vdGVzCmh0dHA6Ly93d3cub21kYmFwaS5jb20vP2FwaWtleT1beW91cmtleV0mCgphcGlrZXkgPSAieW91ciBrZXkiCmkgPSBBIHZhbGlkIElNRGIgSUQgKGUuZy4gdHQxMjg1MDE2KQp0ID0gTW92aWUgdGl0bGUgdG8gc2VhcmNoIGZvcgoKYGBge3J9CmxpYnJhcnkoaHR0cikKbGlicmFyeShqc29ubGl0ZSkKbGlicmFyeShwdXJycikKbGlicmFyeShrZXlyaW5nKQoKCiMgdGhpcyBpcyB0aGUgdXJsIG9mIHRoZSBzaXRlIC0gdGhlIHRvcCBwYXJ0IG9mIGl0Lgp1cmwgPC0gImh0dHA6Ly93d3cub21kYmFwaS5jb20vIgpgYGAKCgoKYGBge3J9CmtleXJpbmdfdW5sb2NrKGtleXJpbmcgPSAiYXBpIikKb21kX2FwaV9rZXkgPC0ga2V5X2dldCgib21kX2FwaV9rZXkiLCBrZXlyaW5nID0gImFwaSIpCmtleXJpbmdfbG9jayhrZXlyaW5nID0gImFwaSIpCgojIHRoZSBlbGVtZW50cyBoZXJlIGFyZSBjcmVhdGVkIGFzIGEgZnVuY3Rpb24KIyB0aGUgdmFyaWFibGUgaXMgZGVjbGFyZWQgYXMgImlkIgojIHRoZSBxdWVyeSBwYXJhbWV0ZXJzIGFyZSBkZWZpbmVkIGFzIGEgbGlzdCBjb250YWluaW5nICJhcGlrZXkiIGFuZCAiaSIuCiMgdGhlc2UgYXJlIHRoZSBuYW1lcyB0aGUgYXBpIHJlcXVpcmVzLgojIApnZXRfYnlfaWQgPC0gZnVuY3Rpb24oaWQpewogIHF1ZXJ5X3BhcmFtcyA8LSBsaXN0KAogICAgYXBpa2V5ID0gb21kX2FwaV9rZXksCiAgICBpICAgICAgPSBpZAogICkKCiAgcmVzcG9uc2UgPC0gR0VUKHVybCwgcXVlcnkgPSBxdWVyeV9wYXJhbXMpCgogIGNvbnRlbnQocmVzcG9uc2UpCn0KYGBgCgpgYGB7cn0KIyBoZXJlIHRoZSBpZHMgYXJlIGRlZmluZWQKaWRzIDwtIGMoCiAgInR0MDIzMjUwMCIsCiAgInR0MDMyMjI1OSIsCiAgInR0MDQ2Mzk4NSIsCiAgInR0MTAxMzc1MiIsCiAgInR0MTU5NjM0MyIsCiAgInR0MDExMDA3NCIKKQpgYGAKCgpgYGB7cn0KIyBoZXJlIHRoZSBhYm92ZSB0d28gZWxlbWVudHMgYXJlIHB1dCB0b2dldGhlcgojIHRoZSBtYXAgZnVuY3Rpb24gaXMgdXNlZApyZXN1bHRzIDwtIG1hcChpZHMsIGdldF9ieV9pZCkKYGBgCgpgYGB7cn0KIyB0aGlzIGlzIGNyZWF0aW5nIGEganNvbiBmaWxlIHVzaW5nIHRoZSByZXN1bHRzIGRlZmluZWQgaW4gdGhlIGFib3ZlIHN0ZXAKd3JpdGVfanNvbihyZXN1bHRzLCAnZmlsbV9pbmZvLmpzb24nLCBhdXRvX3VuYm94ID0gVFJVRSwgcHJldHR5ID0gVFJVRSkKYGBgCgoKYGBge3J9CiMgbWFwX2NociBpcyB1ZWQgdG8gY3JlYXRlIGltZGJfcmF0aW5ncyBvYmplY3QKaW1kYl9yYXRpbmdzIDwtIG1hcF9jaHIocmVzdWx0cywgJ2ltZGJSYXRpbmcnKQojIGNvbnZlcnRpbmcgZnJvbSBjaHIgdG8gbnVtZXJpYyB0byB1c2UgdGhlIG1lYW4gZnVuY3Rpb24uCm1lYW4oYXMubnVtZXJpYyhpbWRiX3JhdGluZ3MpKQpgYGAKCgoKCgo=</div>
 
 
 

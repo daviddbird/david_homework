@@ -1,0 +1,12 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+#message <- employees_with_teams_feedbacks[row, "message"]
+
+employees_with_teams_feedbacks[5, "message"]
+```
+
+

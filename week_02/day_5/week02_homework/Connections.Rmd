@@ -1,0 +1,162 @@
+---
+title: "Week 2 Homework"
+output: html_notebook
+---
+
+
+Create a connection from R to your local acme_employees database.
+```{r}
+library(keyring)
+# keyring_unlock(keyring = "local1")
+# keyring_unlock(keyring = "api")
+# should have used a name to specify the database
+# this will allow you to use the key for lots of
+# different databases
+# should keep work databases in a sperate keyring
+# if you have an error message look at keychain access on mac
+# you might need to give permission for it to be used by R
+# alway check the variable names when you run this
+# as you can see these
+username <- key_get("postgresql_username", keyring = "local1")
+password <- key_get("postgresql_password", keyring = "local1")
+# indico_api_key <- key_get("indico_api", keyring = "api")
+# keyring_lock(keyring = "local1")
+# keyring_lock(keyring = "api")
+
+library(RPostgreSQL)
+
+
+my_db_connection <- dbConnect(drv = PostgreSQL(max.con = 2), user = username, password = password, dbname = "acme_employees", host = "localhost")
+
+rm(list = c("username", "password"))
+
+
+```
+
+
+```{r}
+dbGetQuery(my_db_connection,"
+              SELECT * 
+              FROM employees
+           ")
+```
+
+```{r}
+dbGetQuery(my_db_connection,"
+              SELECT * 
+              FROM feedbacks
+           ")
+```
+
+```{r}
+dbGetQuery(my_db_connection,"
+              SELECT * 
+              FROM teams
+           ")
+```
+
+
+
+Using the connection, execute a SQL query to return the message and date details of any stored feedbacks, together will all the details of the employees who wrote them, and the names of the teams to which the employees belong. Store the results of the query in an R data frame (e.g. employees_with_teams_feedbacks).
+Hints
+note this will be a JOIN over three tables!
+SELECT only those columns you need from each of the tables.
+remember the ON clause of each JOIN should link the primary key of one table with a foreign key in another table.
+some particularly eager or annoyed employees may have provided multiple feedbacks. Don’t worry about this for now, we’ll just process all the stored feedbacks without trying to filter them.
+
+Joining two tables first
+```{r}
+dbGetQuery(my_db_connection,"
+            SELECT employees.*, teams.*, feedback.message
+            FROM (employees INNER JOIN feedbacks
+            ON f.employee_id = employee_id)
+            INNER JOIN on teams AS t
+            ON t.employee_id = employee_id
+           ")
+```
+
+Joining all three tables together
+```{r}
+dbGetQuery(my_db_connection,"
+            SELECT f.*, e.*
+            FROM (feedbacks AS f INNER JOIN employees AS e
+            ON f.employee_id = e.id)
+            INNER JOIN teams AS t 
+            ON e.team_id = t.id
+           ")
+```
+
+```{r}
+dbGetQuery(my_db_connection,"
+            SELECT DISTINCT(f.employee_id), f.*, e.*, t.*
+            FROM (feedbacks AS f INNER JOIN employees AS e
+            ON f.employee_id = e.id)
+            INNER JOIN teams AS t 
+            ON e.team_id = t.id
+           ")
+```
+
+
+```{r}
+employees_with_teams_feedbacks <- dbGetQuery(my_db_connection,"
+            SELECT f.*, e.*, t.*
+            FROM (feedbacks AS f INNER JOIN employees AS e
+            ON f.employee_id = e.id)
+            INNER JOIN teams AS t 
+            ON e.team_id = t.id
+           ")
+```
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+
+```
+
+API key
+
+```{r}
+library(httr)
+
+# sentiment
+# emotion(data, [api_key])
+
+
+params <- list(
+  
+)
+
+url <- "https://apiv2.indico.io/sentiment"
+
+reponse <- GET(url, emotion(query = params, api_key = indico_api_key))
+
+sentiment_scores <- content(response)
+
+# sentiment_scores <- emotion(c('sample text', 'more sample text'), api_key = api)
+
+
+
+```
+
+```{r}
+library(purrr)
+
+extract <- funtion(list, name){
+  
+  as_list <- map(list, name)
+  no_null <- map_if(as_list, is.null, ~'')
+  flatten_chr(no_null)
+}
+```
+
+
+
+
+
+```{r}
+# disconnection string to run when finished with the db
+dbDisconnect(conn = my_db_connection)
+```
+

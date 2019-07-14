@@ -1,0 +1,204 @@
+---
+title: "Map function in Purrr"
+output: html_notebook
+---
+
+```{r}
+library(purrr)
+library(CodeClanData)
+
+colour_feelings <- list(
+  blue   = c("Sad", "Calm"),
+  red    = c("Angry", "Energetic", "Warm"),
+  green  = c("Calm", "Nature"),
+  yellow = c("Happy", "Warm", "Sunny")
+)
+```
+If we wanted to find the length of each vector we can do this in a loop
+
+```{r}
+for (item in colour_feelings){
+  print(length(item))
+}
+```
+
+However, it is easier with the `map` function.
+
+```{r}
+map(colour_feelings, length)
+```
+
+R is vectorised, so functions can apply to every element of a vector automatically.
+owever, functions don't normally apply to every menber of a list automatically.
+The function `map` let's us "vectorise" a list.
+
+If the function we want to apply has extra arguments, just add those arguments
+into map as named arguments.
+
+```{r}
+map(colour_feelings, paste, collapse = ", ")
+```
+
+Sometimes the function we want to apply has to be a bit more complicated. Look
+at this list below that translates colours from English to Scottish Gaelic.
+
+```{r}
+colour_translator <- list(
+  blue    = "gorm",
+  red     = "dearg",
+  green   = "uaine",
+  yellow  = "buidhe"
+)
+```
+
+Say we want to paste the word 'Translation' before each of these words. We
+can't do it directly because the first argument would need to be 'Translation' 
+and the second argument would be the elemt of the list.
+
+One way of doing it is to write our own function.
+```{r}
+add_translation <- function(text){
+  paste("Translation:", text)
+}
+
+map(colour_translator, add_translation)
+```
+
+There is a shorter way of ding this using purrr
+
+```{r}
+ map(colour_translator, ~paste("Translation:", .x))
+```
+
+# Map on Data Frames
+
+The function `map` will always retun a list, so even though we input a data frame, we'll get a list as a result.
+
+```{r}
+students
+```
+
+Each element of a data frame is always the same length. We can check this using
+`map` and `length`.
+
+```{r}
+map(students, length)
+```
+
+Use `map` to answer the following:
+
+Find the number of characters in each translation from the colour translator list.
+
+```{r}
+map(colour_translator, nchar)
+```
+
+Using the colour wavelengths list below, round each wavelength to the nearest
+100.
+
+```{r}
+colour_wavelengths <- list(
+    blue     = 470,
+    red      = 665,
+    green    = 550,
+    yellow   = 600
+)
+```
+
+```{r}
+map(colour_wavelengths, round, digits = -2)
+```
+
+The wavelengths are given in nanometres. Converts to meters by dividing 
+by 1,000,000,000.
+
+~.x references each variable value.
+```{r}
+map(colour_wavelengths, ~.x/100000000)
+```
+
+#Flatten
+
+When you have data inside a list, it is often iseful to convery into a vector. 
+The library `purrr` has several functions for doing this; one for each type of
+vector. For example, if you want to convert the colour translator list into
+a character c=vector use `flatter_chr`.
+
+```{r}
+flatten_chr(colour_translator)
+```
+
+```{r}
+#Vector type          Flatten
+# Double              flatten_dbl
+# Integer             flatten_int
+# Characher           flatten_chr
+# Logical             flatten_lgl
+```
+Often we apply `map` and then want to flatten the result.
+
+```{r}
+colour_feelings_length <- map(colour_feelings, length)
+flatten_dbl(colour_feelings_length)
+```
+You can do this in one step using the special `map` functions that both map
+and flatten.
+
+```{r}
+map_dbl(colour_feelings, length)
+```
+
+```{r}
+#Vector type      Flatten          Map and Flatten
+# Double          flatten_dbl      map_dbl
+# Integer         flatten_int      map_int
+# Character       flatten_chr      map_chr
+# Logical         flatten_lgl      map_lgl
+```
+
+# Data frame
+We can also "flatten' a list into a data frame.
+(This isn't really flattening, because data frames have just as much structure
+as lists). You use `flatten_df` and `map_df`.
+```{r}
+map_df(students, sort)
+```
+
+This is a slightly useless data-frame, because the answers for each student are 
+all muddles up.
+
+# Conditional Mapping
+Sometimes we only want to apply the `map` function to certain elements of our list.
+To demonstrate this look at this list that contains some colour information in
+a different format than we've seen earlier.
+```{r}
+blue <- list(
+    translation  = "gorm",
+    feelings     = c("Sad", "Calm"),
+    primary      = "Yes",
+    wavelength   = 470
+)
+```
+
+The different elements of this list are of different types. This is very 
+common in lists - the whole point of lists is to contain information of 
+different types.
+
+If we want to only count the number of letters for elements of the list which 
+are character vectors we can use `map_if`. The first argument is again this list,
+but the second argument is a function that returns a logical vector, the third
+argument - the function - will only apply when the logical vector is true.
+
+```{r}
+map_if(blue, is.character, nchar)
+```
+
+When the logical vector isn't true, the element is unchanged.
+Again, if we want to use a logical function that's more complicated we canuse 
+the anonymous function shorthand.
+
+below, we are only doing paste, when the length of vector is greater than 1.
+```{r}
+map_if(blue, ~length(.x) > 1, paste, collapse = ", ")
+```
+

@@ -14,10 +14,9 @@ t = Movie title to search for
 library(httr)
 library(jsonlite)
 library(purrr)
+library(keyring)
 
-# file with omd_api_key as the name of the actual key.
-# source puts this in to the environment.
-source('keys.R')
+
 # this is the url of the site - the top part of it.
 url <- "http://www.omdbapi.com/"
 ```
@@ -25,6 +24,10 @@ url <- "http://www.omdbapi.com/"
 
 
 ```{r}
+keyring_unlock(keyring = "api")
+omd_api_key <- key_get("omd_api_key", keyring = "api")
+keyring_lock(keyring = "api")
+
 # the elements here are created as a function
 # the variable is declared as "id"
 # the query parameters are defined as a list containing "apikey" and "i".
@@ -77,49 +80,4 @@ mean(as.numeric(imdb_ratings))
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-```{r}
-response <- GET("http://www.omdbapi.com/?apikey=78207016&?t=Hudsucker+Proxy?")
-http_status(response)
-```
-
-```{r}
-content(response)
-```
-
-
-
-```{r}
-my_key = readLines("keys.R")
-response <- GET("http://www.omdbapi.com/?apikey=key(my_key)&?s=married+to+the+mob")
-http_status(response)
-```
-
-
-query = list(gender = "female", isAlive = TRUE))
-
-
-```{r}
-query <- "http://www.omdbapi.com/?apikey=78207016&?t=Hudsucker+Proxy?"
-
-out <- GET(url = query)
-
-http_status(out)
-```
-
-```{r}
-content(out)
-```
 
