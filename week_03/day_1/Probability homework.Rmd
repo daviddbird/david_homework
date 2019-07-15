@@ -1,0 +1,77 @@
+---
+title: "Probability homework"
+output: html_notebook
+---
+
+```{r}
+library(prob)
+library(gtools)
+```
+#### 1. If I roll a six-sided dice once what is the probability of getting a number 
+####    less than 5?
+Sample space
+S = {1,2,3,4,5,6}
+Event "roll is less than 5"
+Se = {1,2,3,4} Event space
+**Probability = 4/6**
+
+#### 2. How many outcomes are there in the sample space of an experiment in which we
+####    toss three dice? **216**
+
+```{r}
+S <- rolldie(times = 3, makespace = TRUE)
+size_S <- nrow(S)
+size_S
+
+```
+#### 3.i What is the probability of getting a total of the three dice equal
+####     to 5, 6 or 7? **0.1435185**
+#### ii. How many outcomes lie within this event total_equals_5_6_7?  **31**
+
+```{r}
+S <- rolldie(3, makespace = TRUE)
+# makespace adds the probs column
+S <- addrv(space = S, FUN = sum, invars = c("X1", "X2", "X3"), name = "Total")
+S
+size_S <- nrow(S)
+size_S
+
+total_equals_5_6_7 <- subset(S, Total == 5 | Total == 6 | Total == 7)
+total_equals_5_6_7
+size_S_total_5_6_7 <- nrow(total_equals_5_6_7)
+size_S_total_5_6_7
+
+prob_total_5_6_7 <- size_S_total_5_6_7 / size_S
+prob_total_5_6_7
+```
+
+#### 4. Five chairs are in a room along with five people of differing height.
+####    The people sit down randomly on the chairs.
+####    What is the probability that they sit in order of decreasing height,
+####    left to right? **1/120**
+```{r}
+
+people <- c("height5", "height4", "height3", "height2", "height1")
+
+chairs <- permutations(n = 5, r = 5, v = people, repeats.allowed = FALSE)
+
+chairs
+# 120 different combinations with one of those being the correct order.
+# Probability 1/120
+```
+#### 5. I roll six dice.
+####    What is the probability I see the numbers 6,5,4,3,2,1 in order on
+####    the dice, left to right?
+```{r}
+
+```
+
+
+
+#### 6. If I draw a single card from a 52 card deck, and it is black, what is
+####    the probability that its suit is spades? **0.5**
+```{r}
+# Sample space reduced to 26 as we know the card is black.
+# 13 out of the 26 cards are spades so the probability = 13/26 = 0.5
+```
+

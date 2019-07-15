@@ -5,7 +5,7 @@ response_unpacker <- function(response_list){
   # or response_length is length 0,
   # or response_list$results has length 0
   if (length(response_list$results) == 0 | 
-      response_list == is.NULL | length(response_list) == 0){
+      is.null(response_list) | length(response_list) == 0){
     stop("response_unpacker: empty response list")
   }
 

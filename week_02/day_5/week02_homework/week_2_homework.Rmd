@@ -64,15 +64,15 @@ api_results <- data.frame(anger = empty, fear = empty, joy = empty,
 for (row in 1:nrow(employees_with_teams_feedbacks)){
   # get message for this employee
   message <- employees_with_teams_feedbacks[row, "message"]
+
+
+  response_list <- api_fetcher(url, indico_api_key, message)
+
+  emotion_vec <- response_unpacker(response_list)
+
+  # insert the emotion vector for the current employee into the data frame
+  api_results[row, ] <- emotion_vec
 }
-
-response_list <- api_fetcher(url, indico_api_key, message)
-
-emotion_vec <- response_unpacker(response_list)
-
-# insert the emotion vector for the current employee into the data frame
-api_results[row, ] <- emotion_vec
-
 # join API results to original data frame
 employees_with_teams_feedbacks_api <- cbind(employees_with_teams_feedbacks, api_results)
 
@@ -80,6 +80,6 @@ employees_with_teams_feedbacks_api <- cbind(employees_with_teams_feedbacks, api_
 
 ```{r}
 # write to csv file in data/processed
-write_csv(employees_with_teams_feedbacks_api, "./data/processed/employees_with_teams_feedbacks.csv")
-write_json(employees_with_teams_feedbacks_api, "./data/processed/employees_with_teams_feedbacks.json")
+readr::write_csv(employees_with_teams_feedbacks_api, "./data/processed/employees_with_teams_feedbacks.csv")
+jsonlite::write_json(employees_with_teams_feedbacks_api, "./data/processed/employees_with_teams_feedbacks.json")
 ```

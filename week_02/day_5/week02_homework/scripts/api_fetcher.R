@@ -15,6 +15,6 @@ api_fetcher <- function(url, api_key, message){
   }
   
   # return the httr::content() of the response
-  return(httr::content(response_list))
-  
+  return(httr::content(response))
+  # i had response_list here
 }
