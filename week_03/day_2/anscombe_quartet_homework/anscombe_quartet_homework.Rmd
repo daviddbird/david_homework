@@ -1,0 +1,154 @@
+---
+title: "Anscombe Quartet Homework"
+output: html_notebook
+---
+
+summary(anscombe)
+```{r}
+str(anscombe)
+```
+
+**x1**
+```{r}
+mean(anscombe$x1)
+var(anscombe$x1)
+```
+**x2**
+```{r}
+mean(anscombe$x2)
+var(anscombe$x2)
+```
+**x3**
+```{r}
+mean(anscombe$x3)
+var(anscombe$x3)
+```
+**x4**
+```{r}
+mean(anscombe$x4)
+var(anscombe$x4)
+```
+**y1**
+```{r}
+mean(anscombe$y1)
+var(anscombe$y1)
+```
+**y2**
+```{r}
+mean(anscombe$y2)
+var(anscombe$y2)
+```
+**y3**
+```{r}
+mean(anscombe$y3)
+var(anscombe$y3)
+```
+**y4**
+```{r}
+mean(anscombe$y4)
+var(anscombe$y4)
+```
+
+Looking just at the `mean` and `variance` values for each variable it appears 
+that all the "x" values `x1, x2, x3` and `x4` appear very similar.
+
+Likewise all the "y" values `y1, y2, y3` and `y4` appear very similar, again, 
+only judging by the `mean` and `variance` values.
+
+I'm sure this won't turn out to be the case when we visualise the data.
+
+```{r}
+anscombe
+```
+Using an enhanced pairs.panel function from the "psych' library to give a
+very quick indication across all of the `x` values and then all of the `y`
+values.
+
+```{r}
+library(psych)
+pairs.panels(anscombe[c("x1", "x2", "x3", "x4")])
+pairs.panels(anscombe[c("y1", "y2", "y3", "y4")])
+```
+
+The above plot and the boxplot below shows that some datasets do vary.
+x1 - x3 look to have similar properties in both plots. However, x4, y1 and y2
+are clearly different. y3 and y4 look similar but do have differences.
+```{r}
+boxplot(anscombe)
+```
+
+```{r}
+IQR(anscombe$x1)
+e1071::skewness(anscombe$x1)
+```
+
+```{r}
+IQR(anscombe$x2)
+e1071::skewness(anscombe$x2)
+```
+
+```{r}
+IQR(anscombe$x3)
+e1071::skewness(anscombe$x3)
+```
+
+```{r}
+IQR(anscombe$x4)
+e1071::skewness(anscombe$x4)
+```
+```{r}
+anscombe$x4
+```
+
+```{r}
+IQR(anscombe$y1)
+e1071::skewness(anscombe$y1)
+```
+```{r}
+IQR(anscombe$y2)
+e1071::skewness(anscombe$y2)
+```
+```{r}
+IQR(anscombe$y3)
+e1071::skewness(anscombe$y3)
+```
+```{r}
+IQR(anscombe$y4)
+e1071::skewness(anscombe$y4)
+```
+
+
+Not sure I trust the correlation figures of 0.82 for all of the `(x,y)` 
+relationships.
+```{r}
+psych::pairs.panels(anscombe[c("x1", "y1", "x2", "y2", "x3", "y3", "x4", "y4")])
+```
+Each of the plots of the `(x,y)` relationship between the two sets of data shows
+a different pattern on the scatterplot. `(x1, y1)` looks like you could fit a line
+through some of the points although some points are further away.
+```{r}
+plot(x1 ~ y1, data = anscombe)
+```
+This plot shows a curved relation ship between the two variables.
+```{r}
+plot(x2 ~ y2, data = anscombe)
+```
+
+This appears to show a straight-line relationship between the two variables
+but there is one significant outlier that does not fit with this.
+```{r}
+plot(x3 ~ y3, data = anscombe)
+```
+
+Again, appears to show a stright-line relationship with one significant outlier.
+```{r}
+plot(x4 ~ y4, data = anscombe)
+```
+**Correlation coefficients for each `(x,y)` set**
+```{r}
+cor(anscombe$x1, anscombe$y1)
+cor(anscombe$x2, anscombe$y2)
+cor(anscombe$x3, anscombe$y3)
+cor(anscombe$x4, anscombe$y4)
+```
+
