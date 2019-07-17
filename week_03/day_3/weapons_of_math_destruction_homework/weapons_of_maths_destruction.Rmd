@@ -1,0 +1,85 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+Q. What is a weapon of maths destruction?  
+
+A. It is an computer algorithm that is:  
+  
+    * important  
+    * secret (black box)  
+    * destructive / harmful  
+    
+    It often lacks a feedback loop to check it is actually operating correctly.
+    The decisions it makes are often not able to be questioned by those it has 
+    affected. It may uncounsiously be biased and therefore perpetuate human 
+    traits we want to eliminate.
+
+
+
+Q. What kind of decisions could it be used for?
+
+A.  
+    * by HR for hiring employees  
+    * credit card decisions  
+    * insurance decisions  
+    * access to housing  
+    * policing / liberty  
+    * college / univerisity admissions  
+    * adverts  
+    * informing our on-line environment  
+
+
+Q. How are they making negative feedback loops? 
+
+A. They are perpetuating unfairness in many cases. If an individual suffers as
+   a result of an unfair or biased decision, for example, they don't get
+   the job interview they might have, or insurance or lose their job
+   because of an flawed calculation, it not only affects that individual, this
+   negative loop feeds into society at large. The bias that has been
+   coded into the algorithm (even if it is there unintentionally) will 
+   continue to propagate past practices rather than improving a process.
+   
+Q. What do we mean by one variable being a proxy for another?  
+
+A. When sifting applicants for a job for example, an alogorithm may add an extra
+   point for male vocabulary such as "executed" thereby disadvantaging female
+   applicants.The computer algorithms may use what may seem like offhand or
+   irrelevant information which correlates to things like gender, race and class.
+   It can also further disadvantage those who are already disadvantaged in
+   society. Questions such as 
+    * did you grow up in a high crime neighbourhood?
+    * do you have addiction problems
+    * are you a member of a gang
+    test to see how poor or minority you are - so is filtering the population.
+    
+Q. What level of understanding should a decision maker have about a weapon
+   of maths destruction before deciding to implement it?  
+   
+A. From what Cathy said on the podcast, many companies seem to be trying to 
+   dodge the issue through fear of being sued if they were aware of an issue
+   with an algorithm they have deployed. Her company audits these algorithms
+   and in many cases when a comany's legal team get involved they don't want
+   to pursue this if the audit might point to a problem they don't know how
+   to fix. There will be a record that they knew about it and will be liable.
+   Companies need to be more responsible for the effect this is having on 
+   society at large rather than just thinking about their own interests.
+   
+Q. What sort of regulation should be put in place to increase fairness?  
+
+A. There should be more transparency. Those affected by decisions should be
+   able to ask if the data the decision was based on was correct and if it was
+   incorrect, how would that have affected the decision.
+   
+   There needs to be auditability of the algorithms - questions such as:
+   * for whom does the algorithm fail?
+   * does it perpetuate bias, does it fail for black / white, men / women
+   * is the algorithm legal?
+   * do we know when it is used?
+
+   
+   
+
+  
+
