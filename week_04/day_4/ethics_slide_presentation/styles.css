@@ -1,0 +1,27 @@
+body {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font: inherit;
+  font-size: 70%;
+  vertical-align: baseline;
+}
+
+li {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font: inherit;
+  font-size: 80%;
+  vertical-align: baseline;
+}
+
+table {
+  border: 2px solid black;
+}
+
+#img-displayed {
+  display: block;
+  margin-left: auto;
+  margin-right: auto; 
+}
