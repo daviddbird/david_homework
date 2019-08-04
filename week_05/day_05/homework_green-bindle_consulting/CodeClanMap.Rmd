@@ -1,0 +1,19 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(leaflet)
+library(tidyverse)
+
+popup = c("Edinburgh Campus", "Glasgow Campus", "Inverness Campus")
+
+leaflet() %>%
+  setView(-1.074414, 54.614557, zoom = 5) %>%
+  addProviderTiles("NASAGIBS.ViirsEarthAtNight2012") %>%
+                     addMarkers(lng = c(-3.201930, -4.257987, -4.218300),
+                                lat = c(55.947305, 55.865534, 57.477994),
+                                popup = popup)
+```
+

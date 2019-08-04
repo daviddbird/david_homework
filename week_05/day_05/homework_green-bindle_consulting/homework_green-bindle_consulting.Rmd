@@ -1,0 +1,297 @@
+---
+title: "Weekend Homework - week 5"
+output: html_notebook
+---
+
+
+The data for this assignment is provided in the following file:
+
+green_bindle_consulting.xlsx
+```{r}
+library(readxl)
+library(ggplot2)
+cb_palette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7", "#000000")
+
+cb_palette_1 <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "055E00", "#CC79A7", "#EBE9E6")
+```
+
+
+Create at least one plot for each sheet in the dataset.
+Use a variety of different plot types.
+Add labels to make the plots stand on their own.
+Use a consistent colour scheme throughout the plots.
+
+### Sheet1
+```{r}
+# get data
+gb_sheet1 <- read_excel("green_bindle_consulting.xlsx", sheet = 1)
+```
+
+```{r}
+liabil <- gb_sheet1$Item == "Liabilities" & gb_sheet1$Year == "2012"
+```
+
+```{r}
+gb_sheet1[liabil, 3] <- -64.1
+```
+```{r}
+gb_sheet1
+```
+
+
+```{r}
+# greate plot
+ggplot(data = gb_sheet1) +
+  geom_bar(
+    stat = "identity",
+    position = "dodge",
+    aes(
+      x = factor(Year),
+      y = Value,
+      fill = Item,
+      position = "dodge"
+    )
+  ) +
+   labs(x = "",
+       y = "", 
+       title = "Liabilities, Assets and Balances",
+       subtitle = "Across years 2012, 2015 and 2018",
+       caption = "Source: Green-Bindle Consulting LLP") +
+  scale_fill_manual(values = cb_palette_1)
+```
+
+### Sheet2
+```{r}
+gb_sheet2 <- read_excel("green_bindle_consulting.xlsx", sheet = 2)
+```
+
+```{r}
+library(tidyverse)
+gb_sheet2 %>%
+  filter(Status !="Tot") %>%
+  ggplot() +
+  aes(x = "", y = Value, fill = Status) +
+  geom_col(stat = "identity", width = 0.5) +
+  coord_polar("y") +
+  facet_wrap(~ Year) +
+  labs(x = "",
+       y = "", 
+       title = "Value by Status",
+       subtitle = "Across years 2012, 2015 and 2018",
+       caption = "Source: Green-Bindle Consulting LLP") +
+  scale_fill_manual(values = cb_palette_1) +
+  theme_minimal()
+  
+```
+
+
+```{r}
+library(tidyverse)
+gb_sheet2 %>%
+  filter(Status !="Tot") %>%
+  ggplot() +
+  aes(x = "", y = Value, fill = Status) +
+  geom_col(stat = "identity", width = 0.5) +
+  facet_wrap(~ Year) +
+  labs(x = "Year",
+       y = "Value", 
+       title = "Value by Status",
+       subtitle = "Across years 2012, 2015 and 2018",
+       caption = "Source: Green-Bindle Consulting LLP") +
+  scale_fill_manual(values = cb_palette_1) +
+  theme_minimal()
+```
+
+
+Sheet3
+```{r}
+gb_sheet3 <- read_excel("green_bindle_consulting.xlsx", sheet = 3)
+```
+```{r}
+gb_sheet3
+```
+```{r}
+gb_sheet3$Time <- 1:nrow(gb_sheet3)
+gb_sheet3$Balance <- cumsum(c(0, gb_sheet3$Value[-nrow(gb_sheet3)]))
+gb_sheet3$xmin <- gb_sheet3$Time - 0.45 # a little after half way betwen t-1 and t
+gb_sheet3$xmax <- gb_sheet3$Time + 0.45 # a little before half way between t and t+1
+gb_sheet3$ymin <- gb_sheet3$Balance # balance before cashflow
+gb_sheet3$ymax <- gb_sheet3$Balance + gb_sheet3$Value # balance after cashflow
+```
+
+```{r}
+ggplot(data = gb_sheet3) +
+  geom_rect(aes(
+    xmin = xmin,
+    xmax = xmax,
+    ymin = ymin,
+    ymax = ymax,
+    fill = Item
+  )) +
+  labs(x = "Value",
+       y = "Allocation", 
+       title = "Allocations",
+       subtitle = "Across Region, Asset Class and Purpose",
+       caption = "Source: Green-Bindle Consulting LLP") +
+  scale_fill_manual(values = cb_palette_1) +
+   theme_minimal() 
+```
+```{r}
+?scale_color_grey()
+```
+
+
+### Sheet4
+```{r}
+gb_sheet4 <- read_excel("green_bindle_consulting.xlsx", sheet = 4)
+```
+```{r}
+summary(gb_sheet4)
+```
+
+```{r}
+ggplot(gb_sheet4, aes(x = Date, y = Allocation, fill = Region)) +
+  geom_col() +
+  facet_wrap(Purpose~Asset_Class) +
+  labs(x = "Date and Strategic",
+       y = "Allocation", 
+       title = "Allocations",
+       subtitle = "Across Region, Asset Class and Purpose",
+       caption = "Source: Green-Bindle Consulting LLP") +
+  scale_fill_manual(values = cb_palette_1) +
+   theme_minimal() 
+```
+
+
+
+
+
+
+
+
+### Sheet5
+```{r}
+gb_sheet5 <- read_excel("green_bindle_consulting.xlsx", sheet = 5)
+```
+```{r}
+gb_sheet5
+```
+
+```{r}
+summary(gb_sheet5)
+```
+
+```{r}
+ggplot(data = gb_sheet5, aes(x = Basis, y = TPs, fill = Item)) +
+  geom_bar(stat = "identity", position = "identity") +
+  labs(x = "Basis",
+       y = "TPs", 
+       title = "Value of TPs",
+       subtitle = "Across items: Assets, Balance and Liabilities",
+       caption = "Source: Green-Bindle Consulting LLP") +
+  scale_fill_manual(values = cb_palette_1) +
+   theme_minimal() 
+  
+```
+
+
+### Sheet6
+```{r}
+gb_sheet6 <- read_excel("green_bindle_consulting.xlsx", sheet = 6)
+```
+
+```{r}
+summary(gb_sheet6)
+```
+
+```{r}
+ggplot(data = gb_sheet6, aes(x = Scenario, y = Balance)) +
+  geom_histogram(stat = "identity") +
+  labs(x = "Scenario",
+       y = "Balance", 
+       title = "Outcomes for Scenarios 1 - 101",
+       subtitle = "Across all company pensions plans",
+       caption = "Source: Green-Bindle Consulting LLP") +
+  scale_fill_manual(values = cb_palette_1) +
+    theme_minimal() 
+  
+```
+
+
+```{r}
+ggplot(data = gb_sheet6, aes(x = Scenario, y = Balance)) +
+  geom_point() +
+  geom_density_2d() +
+  labs(x = "Scenario",
+       y = "Balance", 
+       title = "Outcomes for Scenarios 1 - 101",
+       subtitle = "Across all company pensions plans",
+       caption = "Source: Green-Bindle Consulting LLP") +
+  scale_color_manual(values = cb_palette_1) +
+    theme_minimal()
+```
+
+
+
+
+
+### Sheet7
+```{r}
+gb_sheet7 <- read_excel("green_bindle_consulting.xlsx", sheet = 7)
+```
+
+```{r}
+summary(gb_sheet7)
+```
+
+```{r}
+ggplot(data = gb_sheet7, aes(x = Year, y = Cashflow, colour = Status)) +
+  geom_line() +
+  labs(x = "Year",
+       y = "Cashflow", 
+       title = "Cashflow projectons from 2019 - 2059 ",
+       subtitle = "Across all company pensions plans",
+       caption = "Source: Green-Bindle Consulting LLP") +
+  scale_color_manual(values = cb_palette_1) +
+    theme_minimal() 
+```
+
+```{r}
+ggplot(data = gb_sheet7, aes(x = Year, y = Cashflow, colour = Status)) +
+  geom_line() +
+  labs(x = "Year",
+       y = "Cashflow", 
+       title = "Cashflow projectons from 2019 - 2059 ",
+       subtitle = "Across all company pensions plans",
+       caption = "Source: Green-Bindle Consulting LLP") +
+  scale_color_manual(values = cb_palette_1) +
+    theme_minimal() +
+  facet_grid(~Status)
+```
+
+
+### Sheet8
+```{r}
+gb_sheet8 <- read_excel("green_bindle_consulting.xlsx", sheet = 8)
+```
+
+
+```{r}
+library(forcats)
+
+gb_sheet8$Word <- fct_reorder(gb_sheet8$Word, gb_sheet8$Size)
+  
+ggplot(data = gb_sheet8, aes(x = Word, y = Size)) +
+  geom_col() +
+  labs(x = "Word",
+       y = "Percentage use", 
+       title = "Analysis of words used in correspondence",
+       subtitle = "Across all company pensions plans",
+       caption = "Source: Green-Bindle Consulting LLP") +
+  scale_fill_manual(values = cb_palette_1) +
+  coord_flip() +
+  theme_minimal() 
+  
+```
+
+
