@@ -1,0 +1,161 @@
+---
+title: "dplyr_homework"
+output: html_notebook
+---
+
+
+Load in the dataset and call it drinks_content, eyeball it by printing it out (first 5 rows, last 5 rows, and then all of the data) and find out the dimensions (number of rows/columns) and variable names.
+```{r}
+library(readr)
+library(tidyverse)
+starbucks_drinks <- 
+  read_csv("data/starbucks_drinkMenu_expanded.csv")
+```
+
+```{r}
+head(starbucks_drinks, n = 5)
+```
+
+```{r}
+tail(starbucks_drinks, n = 5)
+```
+
+```{r}
+dim(starbucks_drinks)
+```
+
+```{r}
+names(starbucks_drinks)
+```
+
+We’re going to be looking at the number of calories in each drink.
+
+Calculate some quick summary statistics to check the mean, the variance, and the normality of this variable.
+
+```{r}
+summary(starbucks_drinks$Calories)
+```
+
+```{r}
+var(starbucks_drinks$Calories)
+```
+
+```{r}
+starbucks_drinks %>%
+  ggplot(aes(Calories)) + 
+  geom_histogram()
+```
+
+Check if you have any outliers in the Calories variable by creating a boxplot. Then get the actual values of any outliers you have. Finally remove the outliers and save the new tibble as drinks_content_nooutlier.
+
+```{r}
+starbucks_drinks %>%
+  ggplot(aes(x = NULL, y = Calories)) +
+  geom_boxplot()
+```
+
+```{r}
+outliers <- 
+  boxplot(starbucks_drinks$Calories, plot = FALSE)$out
+print(outliers)
+```
+
+```{r}
+starbucks_drinks[which(starbucks_drinks$Calories %in% outliers), ]
+```
+
+Remove the outliers and save the new tibble as drinks_content_nooutlier
+```{r}
+drinks_content_nooutlier <- 
+  starbucks_drinks[-which(starbucks_drinks$Calories %in% outliers), ]
+```
+
+
+Select the variables beverage_category, beverage, beverage prep and calories from the data (drinks_content_nooutlier), and assign it to a new tibble called drinks. Since we are interested in the calorie content, check if there are any NA values in the data, and drop them if there are.
+```{r}
+drinks <-drinks_content_nooutlier %>%
+  select(Beverage_category, Beverage, Beverage_prep, Calories)
+```
+
+```{r}
+is.na(drinks)
+```
+
+
+Filter the data so we only take “classic espresso drinks”, and save this in a new tibble called espresso_drinks.
+```{r}
+espresso_drinks <- drinks %>%
+  filter(Beverage_category == "Classic Espresso Drinks")
+```
+
+
+Create a new tibble called drink_calories which contains a variable called calorie_diff. calorie_diff should store the difference between 135 calories (135 calories = 10 cubes of sugar!) and the calories in each drink. (hint: you’ll want to subtract the calories from 135 to see which drink have more or less than 10 cups of sugar).
+```{r}
+drink_calories <- espresso_drinks %>%
+  mutate(calorie_diff = 135 - Calories)
+```
+
+
+Create a new tibble called drinks_grouped where you group your data by the type of beverage prep. Then summarise the mean calories in each drink (by group) in a variable called mean_cal, and save it to drinks_summary. Finally arrange this summary data in descending order of mean calories.
+```{r}
+drinks_grouped <- drink_calories %>%
+  group_by(Beverage_prep) %>%
+  summarise(mean_cal = mean(Calories))
+```
+
+
+Hopefully you can see by now how much hassle it can be to constantly keep creating tibbles to store all your data.
+
+Finish up by using the %>% operator to put all the answers you’ve got from questions 4-7 into one pipe. You don’t need to include the check for NA values in this, as you’d typically check that before you start doing any analysis.
+```{r}
+drinks %>%
+  filter(Beverage_category == "Classic Espresso Drinks") %>%
+  mutate(calorie_diff = 135 - Calories) %>%
+  group_by(Beverage_prep) %>%
+  summarise(mean_cal = mean(Calories))
+```
+
+Extensions
+Use the drink_calories data, and for each drink, use the min_rank function to find the two drinks (Beverage) with most Calories. Save this in a new tibble called most_calories.
+
+```{r}
+most_calories <- drink_calories %>%
+  filter(min_rank(desc(Calories)) == 1) %>%
+  select(Beverage, Calories)
+
+most_calories
+```
+
+For each drink in the drinks_grouped data, find all drinks which more calories than the average drink. Save this in a new tibble called above_average_calories.
+```{r}
+above_average_calories <- drinks_grouped %>%
+  mutate(avg_of_group = mean(mean_cal)) %>%
+  filter(mean_cal > avg_of_group)
+
+above_average_calories
+```
+
+
+Within each drink group, rank each beverage by the number of calories. Save this ranking in a new column called ranking. Save the new output in a new tibble called drinks_ranked.
+```{r}
+ranking <- drinks_grouped %>%
+  arrange(desc(mean_cal)) %>%
+  filter(min_rank(desc(mean_cal)) >= 1)
+
+ranking
+  
+```
+
+
+
+
+Using the drinks_grouped data, apply the cume_dist function to get the top 25% of Calorie drinks within each group. Save this in a new tibble called drinks_distribution.
+```{r}
+drinks_distribution <- drinks_grouped %>%
+  arrange(desc(mean_cal)) %>%
+  filter(cume_dist(desc(mean_cal)) < 0.25)
+
+drinks_distribution
+```
+
+

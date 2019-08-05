@@ -294,4 +294,13 @@ ggplot(data = gb_sheet8, aes(x = Word, y = Size)) +
   
 ```
 
+```{r}
+ame_sheets<-excel_sheets("~/Documents/green_bindle_consulting.xlsx")
+num_sheets<-length(name_sheets)
+
+for(i in 1:num_sheets) {
+  assign(name_sheets[i], data.frame(read_excel("~/Documents/green_bindle_consulting.xlsx", 
+                                                        sheet = i)))
+  }
+```
 
