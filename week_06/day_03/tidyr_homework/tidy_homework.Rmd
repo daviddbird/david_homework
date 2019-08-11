@@ -121,6 +121,7 @@ typeof(open_stock_data)
 
 ```{r}
 map_dbl(open_stock_data$date, as_datetime)
+map(open_stock_data$date, dmy)
 ```
 
 
