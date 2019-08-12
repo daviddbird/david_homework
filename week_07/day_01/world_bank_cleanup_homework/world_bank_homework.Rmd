@@ -1,0 +1,198 @@
+---
+title: "World Bank cleanup homework"
+output: html_notebook
+---
+
+```{r}
+# Question 1
+library(readr)
+women_in_gov <- read_csv("data/women_in_gov.csv", skip = 3)
+```
+```{r}
+# Question 2
+women_in_gov2 <- women_in_gov
+names(women_in_gov2) <- make.names(names(women_in_gov2))
+names(women_in_gov2)
+```
+
+```{r}
+# Question 3
+library(tidyverse)
+unique(women_in_gov2$X64)
+unique(women_in_gov2$Indicator.Name)
+unique(women_in_gov2$Indicator.Code)
+
+women_in_gov2 <- women_in_gov2 %>%
+  select(-X64, -Indicator.Name, -Indicator.Code)
+
+women_in_gov2
+```
+```{r}
+# Question 4.
+colnames(women_in_gov2)[1] <- "country" 
+colnames(women_in_gov2)[2] <- "code"
+```
+
+```{r}
+# Question 5
+women_in_gov3 <- women_in_gov2 %>%
+  gather(year, value, -country, -code)
+
+women_in_gov3
+```
+
+```{r}
+# Question 6
+women_in_gov3 %>%
+  summarise(count = sum(is.na(value)))
+
+na_women_in_gov3 <- women_in_gov3 %>%
+  filter(is.na(value))
+
+dim(women_in_gov3)
+dim(na_women_in_gov3)
+
+women_in_gov3 %>%
+  group_by(year) %>%
+  summarise(count_NA = sum(is.na(value)), count_n = n(), valid_entries = n() - sum(is.na(value)))
+ 
+
+```
+
+```{r}
+# removing the years where there are no entries at all
+women_in_gov4 <- women_in_gov2 %>%
+  select(-X1960, -X1961, -X1962, -X1963, -X1964, -X1965, -X1966, -X1967, -X1968, -X1969, -X1970, -X1971, -X1972, -X1973, -X1974, -X1975, -X1976, -X1976, -X1977, -X1978, -X1979, -X1980, -X1981, -X1982, -X1983, -X1984, -X1985, -X1986, -X1987, -X1988, -X1989, -X1991, -X1992, -X1993, -X1994, -X1995, -X1996)
+
+# gathering back up
+women_in_gov4 <- women_in_gov4 %>%
+  gather(year, value, -country, -code)
+
+women_in_gov4
+```
+
+```{r}
+#counting the NAs
+women_in_gov4 %>%
+  summarise(count = sum(is.na(value)))
+
+na_women_in_gov4 <- women_in_gov4 %>%
+  filter(is.na(value))
+
+```
+
+
+
+```{r}
+library(mice)
+#mice package has a function known as md.pattern().
+#it returns a tabular form of missing value present in each variable in a data set
+md.pattern(women_in_gov4, rotate.names = TRUE)
+
+women_in_gov4 %>%
+  summarise(count = sum(is.na(value)))
+```
+
+
+```{r}
+#lets do the simulations 
+women_in_gov_data <- women_in_gov4 %>%
+  select(year, value)
+
+imputed_data <- mice(women_in_gov_data, m = 3, maxit = 10)
+summary(imputed_data)
+```
+```{r}
+# pick out the values column
+imputed_data$imp$value
+```
+
+
+```{r}
+# i picked the middle column 2
+complete_data <- complete(imputed_data, 2)
+
+ggplot(complete_data, aes(year, value)) + 
+  geom_point()
+```
+
+
+```{r}
+histogram(complete_data$value)
+```
+
+```{r}
+histogram(women_in_gov_data$value)
+```
+
+
+```{r}
+#using the mean as the histogram is right tailed
+women_in_gov_imputed <- women_in_gov_data %>%
+  mutate(value_imputed = replace(value, 
+                                           is.na(value),
+                                           mean(value, na.rm = TRUE)
+                                           ))
+
+women_in_gov_imputed %>%
+  summarise(count = sum(is.na(value_imputed)))
+
+names(women_in_gov_imputed)
+
+# removing the X from the year
+women_in_gov_imputed <- women_in_gov_imputed %>%
+  separate(year, c("X", "year"), "X") %>%
+  select(-X)
+
+women_in_gov_imputed
+
+ggplot(women_in_gov_imputed, aes(year, value_imputed )) + geom_point()
+```
+
+```{r}
+# removing the year from the data created with the "mice" library
+complete_data %>%
+separate(year, c("X", "year"), "X") %>%
+  select(-X)
+```
+
+
+```{r}
+#Question 7
+
+ggplot(complete_data, aes(x = year, y = value)) +
+  geom_boxplot() +
+  coord_flip()
+```
+
+
+```{r}
+#Question 8
+library(outliers)
+#get the z-scores for each value in value
+value_zscores <- scores(complete_data$value)
+```
+
+```{r}
+#create a logical vaector the same length as outlier_scores
+#that is "TRUE" if outlier_scores is greater than 3 or less than -3
+is_outlier <- value_zscores > 3 | value_zscores <  -3
+
+#add a column with info whether the value is an outlier
+complete_data$is_outlier <- is_outlier
+
+#look at the same plot as above, with outliers in a separate facet
+ggplot(complete_data, aes(year, value)) +
+  geom_boxplot() +
+  coord_flip() +
+  facet_wrap(~ is_outlier)
+```
+
+```{r}
+#create a table with only outliers
+women_in_gov_outliers<- complete_data[value_zscores > 3 | value_zscores < -3, ]
+
+head(women_in_gov_outliers)
+```
+
+
