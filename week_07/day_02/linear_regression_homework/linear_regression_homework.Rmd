@@ -1,0 +1,118 @@
+---
+title: "Linear Regression Homework"
+output: html_notebook
+---
+
+```{r}
+library(readr)
+#Question 2
+#load the data into a dataframe project
+project <- read_csv("project_management.csv")
+```
+
+```{r}
+head(project)
+```
+
+```{r}
+#plot the data taking the estimated_length as the independant variable (predictor)
+#and actual_length as the dependent (reponse) variable.
+plot(project$estimated_length, project$actual_length)
+
+#label the data points with their row number in the data frame using the command
+text(project$estimated_length, project$actual_length, labels = seq(nrow(project)), cex = 0.7, pos = 2)
+```
+```{r}
+#identify any points you think might be outliers and note their labels
+#5 and 18?
+
+#further split your outliers into those you think are 'influential' or 'non-influential
+#based on an assessment of their leverage.
+
+# point 5 has high leverage
+# point 5 is also outside the Cook's distance dotted red line - points
+#outside of the dotted red line have high influence.
+# point 18 does not have high influence.
+```
+
+
+```{r}
+#full dataset
+#regress actual_length on estimated_length and confirm your visual assessment of 
+#which points are 'influential' or 'non-influential'
+plot(project$actual_length, project$estimated_length)
+lin_model <- lm(estimated_length ~ actual_length, data = project)
+#predict_at <- data.frame(x = seq(0, 50, 1))
+#predicted_y <- predict(lin_model, newdata = predict_at)
+text(project$actual_length, project$estimated_length, labels = seq(nrow(project)), cex = 0.7, pos = 2)
+abline(lin_model)
+plot(lin_model)
+summary(lin_model)
+```
+```{r}
+#obtain the intercept and regression coefficient of variable estimated_length
+#for a simple linear model fitted to data omitting one of your non-influential
+#outlier points
+
+project_no_row_18 <- project[-c(18), ]
+project_no_row_18 
+
+```
+
+```{r}
+#non-influential plot
+plot(project_no_row_18$actual_length, project_no_row_18$estimated_length)
+lin_model_non_inf <- lm(estimated_length ~ actual_length, data = project_no_row_18)
+#predict_at <- data.frame(x = seq(0, 50, 1))
+#predicted_y <- predict(lin_model, newdata = predict_at)
+text(project_no_row_18$actual_length, project_no_row_18$estimated_length, labels = seq(nrow(project_no_row_18)), cex = 0.7, pos = 2)
+abline(lin_model_non_inf, col = "red")
+abline(lin_model)
+plot(lin_model_non_inf)
+```
+```{r}
+#obtain the intercept and regression coefficient
+summary(lin_model)
+```
+
+```{r}
+#removing influential outlier row 5
+project_no_row_5 <- project[-c(5), ]
+project_no_row_5 
+```
+```{r}
+#data with influential outlier removed
+plot(project_no_row_5$actual_length, project_no_row_5$estimated_length)
+lin_model_inf <- lm(estimated_length ~ actual_length, data = project_no_row_5)
+#predict_at <- data.frame(x = seq(0, 50, 1))
+#predicted_y <- predict(lin_model, newdata = predict_at)
+text(project_no_row_5$actual_length, project_no_row_5$estimated_length, labels = seq(nrow(project_no_row_5)), cex = 0.7, pos = 2)
+abline(lin_model_inf, col = "blue")
+abline(lin_model)
+plot(lin_model_inf)
+summary(lin_model_inf)
+```
+```{r}
+#Return to your fitted model for the complete dataset and examine and comment upon the
+#Residuals vs Fitted
+#The line is veering off dramatically at 18 mark and is moving about the 0 line before that
+
+#Normal Q_Q
+#The points are not close to the straight line, they start to veer off midway through
+
+#Scale-Location
+#This jumps dramatically
+
+#full dataset
+#regress actual_length on estimated_length and confirm your visual assessment of 
+#which points are 'influential' or 'non-influential'
+plot(project$actual_length, project$estimated_length)
+lin_model <- lm(estimated_length ~ actual_length, data = project)
+#predict_at <- data.frame(x = seq(0, 50, 1))
+#predicted_y <- predict(lin_model, newdata = predict_at)
+text(project$actual_length, project$estimated_length, labels = seq(nrow(project)), cex = 0.7, pos = 2)
+abline(lin_model)
+plot(lin_model)
+summary(lin_model)
+```
+
