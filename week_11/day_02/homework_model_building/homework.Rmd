@@ -1,0 +1,226 @@
+---
+title: "Model Building Homework"
+output: html_notebook
+---
+
+
+# MVP
+
+You are given a set of data on housing sale prices for the last few years in King County (near Seattle) between May 2014 and May 2015. Have a look at the variable definitions on the [Kaggle page](https://www.kaggle.com/harlfoxem/housesalesprediction)
+
+```{r}
+library(readr)
+kc_house_data <- read_csv("kc_house_data.csv")
+```
+
+
+* Tidy up the data ready for regression:
+
+    * You might like to think about removing some or all of `date`, `id`, `sqft_living15`, `sqft_lot15` and `zipcode` (`lat` and `long` provide a better measure of location in any event).
+
+```{r}
+str(kc_house_data)
+```
+    
+```{r}
+kc_house_data$id <- NULL
+```
+```{r}
+kc_house_data$sqft_living15 <- NULL
+```
+```{r}
+kc_house_data$sqft_lot15 <- NULL
+```
+```{r}
+kc_house_data$zipcode <- NULL
+```
+
+  
+    * Have a think about how to treat `waterfront`. Should we convert its type?
+
+```{r}
+unique(kc_house_data$waterfront)
+```
+```{r}
+kc_house_data$waterfront <- as.logical(kc_house_data$waterfront)
+```
+```{r}
+unique(kc_house_data$waterfront)
+```
+
+
+    * We converted `yr_renovated` into a `renovated` logical variable, indicating whether the property had ever been renovated. You may wish to do the same.
+```{r}
+library(tidyverse)
+unique(kc_house_data$yr_renovated)
+```
+```{r}
+# addin a true/false renovated column 
+kc_house_data$renovated <- ifelse(kc_house_data$yr_renovated > 0, TRUE, FALSE)
+```
+
+```{r}
+
+```
+
+    * Have a think about how to treat `condition` and `grade`? Are they interval or categorical ordinal data types?
+```{r}
+# condition and grade are categorical ordinal data types.
+unique(kc_house_data$condition)
+unique(kc_house_data$grade)
+```
+```{r}
+library(fastDummies)
+kc_house_data <- dummy_cols(kc_house_data, select_columns = c("condition", "grade"), remove_first_dummy = TRUE)
+glimpse(kc_house_data)
+```
+
+
+* Check for aliased variables using the `alias()` function (this takes in a formula object and a data set). [**Hint** - formula `price ~ .` says 'price varying with all predictors', this is a suitable input to `alias()`]. Remove variables that lead to an alias.
+
+```{r}
+kc_house_data$date <- NULL
+```
+
+```{r}
+alias(price ~ ., kc_house_data)
+```
+```{r}
+?alias
+```
+Looked up hep and online but not really sure what to so with the result of this.
+
+
+
+* Systematically build a regression model containing up to **four** main effects (remember, a main effect is just a single predictor with coefficient), testing the regression diagnostics as you go
+
+```{r}
+library(tidyverse)
+library(modelr)
+library(ggiraphExtra)
+library(GGally)
+```
+
+
+```{r}
+library(psych)
+```
+
+```{r}
+pairs.panels(kc_house_data[c("price", "bedrooms", "bathrooms", "sqft_living", "sqft_lot", "floors", "view", "condition", "sqft_above", "sqft_basement")])
+```
+
+```{r}
+mod1a <- lm(price ~ sqft_living, data = kc_house_data)
+summary(mod1a)
+
+mod1b <- lm(price ~ sqft_above, data = kc_house_data)
+summary(mod1b)
+```
+1a better (sqft_living) r sqrd 0.4929
+
+```{r}
+par(mfrow = c(2,2))
+plot(mod1a)
+plot(mod1b)
+```
+
+```{r}
+kc_house_data_remaining_resid <- kc_house_data %>%
+  add_residuals(mod1a) %>%
+  select(-c("price", "sqft_living"))
+
+# manually removed "price" and "sqft living"
+pairs.panels(kc_house_data_remaining_resid[c("bedrooms", "bathrooms", "sqft_lot", "floors", "view", "condition", "sqft_above", "sqft_basement")])
+```
+Try bathrooms and the sqft_above
+```{r}
+mod2a <- lm(price ~ sqft_living + bathrooms, data = kc_house_data)
+summary(mod2a)
+mod2b <- lm(price ~ sqft_living + sqft_above, data = kc_house_data)
+summary(mod2b)
+```
+not much in it mod2b best r sqrd 0.4933
+```{r}
+par(mfrow = c(2,2))
+plot(mod2a)
+plot(mod2b)
+```
+
+mod2b better (marginally)
+in both items are appearing in Cooks distance so some outliers having a
+disproportionate effect.
+
+```{r}
+anova(mod2a, mod2b)
+```
+
+```{r}
+kc_house_data_remaining_resid <- kc_house_data %>%
+  add_residuals(mod2b) %>%
+  select(-c("price", "sqft_living", "sqft_above"))
+
+#manually removed "price", "sqft_living", "sqft_above"
+pairs.panels(kc_house_data_remaining_resid[c("bedrooms", "bathrooms", "sqft_lot", "floors", "view", "condition", "sqft_basement")])
+
+
+```
+Bathrooms and sqft_basement next to try
+
+```{r}
+mod3a <- lm(price ~ sqft_living + sqft_above + bathrooms, data = kc_house_data)
+summary(mod3a)
+mod3b <- lm(price ~ sqft_living + sqft_above + sqft_basement, data = kc_house_data)
+summary(mod3b)
+```
+no difference in R squrd figure of 0.4933 for both.
+
+```{r}
+anova(mod3a, mod3b)
+```
+
+
+
+
+
+
+
+
+    * splitting datasets into numeric and non-numeric columns might help `ggpairs()` run in manageable time, although you will need to add either a `price` or `resid` column to the non-numeric dataframe in order to see its correlations with the non-numeric predictors.
+
+<details>
+<summary>**Hints**</summary>
+```{r, eval=FALSE}
+houses_tidy_numeric <- houses_tidy %>%
+  select_if(is.numeric)
+
+houses_tidy_nonnumeric <- houses_tidy %>%
+  select_if(function(x) !is.numeric(x))
+
+houses_tidy_nonnumeric$price <- houses_tidy$price
+
+ggpairs(houses_tidy_numeric)
+ggpairs(houses_tidy_nonnumeric)
+```
+and the same in subsequent rounds of predictor selection with the `resid` column.<br><br>
+Remember, if you are not sure whether including a categorical predictor is statistically justified, run an `anova()` test passing in the models with- and without the categorical predictor and check the p-value of the test.
+</details>
+
+
+
+
+
+
+
+# Extensions
+
+* Consider possible interactions between your four main effect predictors and test their effect upon $r^2$. Choose your best candidate interaction and visualise its effect. 
+
+* Calculate the relative importance of predictors from your best $4$-predictor model (i.e. the model without an interaction). Which predictor affects `price` most strongly?
+
+
+
+```{r}
+
+```
+

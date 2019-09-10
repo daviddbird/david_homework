@@ -198,7 +198,9 @@ Could not get this to run.
 library(ggiraphExtra)
 model_interaction <- lm(log(price) ~ log(carat) + clarity + log(carat):clarity, data = diamonds_trim)
 
-ggPredict(model_interaction)
 summary(model_interaction)
+
+#ggPredict(model_interaction)
+#summary(model_interaction)
 ```
 
