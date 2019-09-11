@@ -1,0 +1,62 @@
+---
+title: "Homework Quiz"
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+1. I want to predict how well 6 year-olds are going to do in their final school exams. Using the following variables am I likely under-fitting, fitting well or over-fitting? Postcode, gender, reading level, score in maths test, date of birth, family income.
+**A. I don't think you should be using _gender_ in the final model. The other features seem valid, although should be careful not to make
+the model too complex**
+
+2. If I have two models, one with an AIC score of 34,902 and the other with an AIC score of 33,559 which model should I use?
+**A. When looking at the the AIC score - the lower score should be the better one. So the model with score of 33,559 shold be used. **
+
+3. I have two models, the first with: r-squared: 0.44, adjusted r-squared: 0.43. The second with: r-squared: 0.47, adjusted r-squared: 0.41. Which one should I use?
+**A. When looking at adjusted r-squared thw higher score should be the better one so the first model should be selected.**
+
+4. I have a model with the following errors: RMSE error on test set: 10.3, RMSE error on training data: 10.4. Do you think this model is over-fitting?
+**A. A lower RMSE is best - however the error will always be greater on the test data as the model will not have seen that data before. So not sure why the error should be lower on the test set? **
+
+5. How does k-fold validation work?
+**A. When using this type of validation, you normally pick a k value - usually 10 ( this is the number of data folds / or sections that your data is split into). A model is then made 10 times, each time we hold out one of the folds as the test set and train the data on the other 9 folds. Once the process is finished, we can average the error across all the test folds. This gives an accurate measure of model performance. It can be slow to run if you have a large dataset, or a computationally intensive model.**
+
+6. What is a validation set? When do you need one?
+**A. A set that is used neither to test or train your models. Used as a final measure of accuracy. **
+
+
+7. Describe how backwards selection works.
+**A. You start with a model that contains all possible predictors. At each step, chack all predictors in the model, and find the one that lowers the r squared value the least when it is removed. Remove that predictor from the model. Keep a note of the details of the model at each step and continue to remove another predictor, or stap when all the predictors in the model have been removed.**
+
+8. Describe how best subset selection works.
+**A. This is also called Exhaustive search. At each size of model, search all possible combinations of predictors for the best model (i.e. the model with the highest r squared) of that size. The effort of the algorithm increases exponetially with the number of predictors. **
+
+9. It is estimated on 5% of model projects end up being deployed. What actions can you take to maximise the likelihood of your model being deployed?
+**A. Try to ensure the model does not generate too many false positives. Explain and clearly communicate the purpose and process of the model to difference audiences who need to have an understanding of this in the business. Make sure you fully understand the business need this model will address and verify with the business that your understanding around this is correct at all stages of development of the model. Perhaps taking an agile approach to make sure a business champion for this area is involved. Make sure you have enough data to successfully train and test your model prior to putting it into production. Try to minimise complexity as that will help with business adoption. Also try to make sure that the decisions the model makes are explainable in a way the business can understand.**
+
+10. What metric could you use to confirm that the recent population is similar to the development population?
+*A. The Population Stability Index (PSI).**
+
+
+11. How is the Population Stability Index defined? What does this mean in words?
+*A. This is used to help answer the question, has the population shifted too much for the model still to be valid. This is an important concept in model management. It is crucial to monitor whether the current population has changed from the population used during the development of a model. Existing rules of thumb are PSI < 0.10 means little shift, 0.10<PSI<0.25 means moderate shift and PSI>0.25 means a significat shift and actions is required.*
+
+
+12. Above what PSI value might we need to start to consider rebuilding or recalibrating the model
+*A. When the PSI is > 0.25*
+
+
+13. What are the common errors that can crop up when implementing a model?
+*A  Find that the model dosen't address the root cause, only the symptioms of the problem. Can find the model is too difficult to implement.Are there policy rules which crop up which may force a human decision to be made. Business may decide to use a model for a purpose it was not design for. *
+
+
+14. After performance monitoring, if we find that the discrimination is still satisfactory but the accuracy has deteriorated, what is the recommended action?
+*A. The model discrimination is the predictive power of the model for a recent production population matches the expected discriminatory power from tej development dataset. This is usually measured using a gini coefficient. The gini coefficient is calculated for a recent production population and compared with the expected values from the build dataset. If discrimination is still satisfactory, but point estimates are not accurate the action shoudl be to re-calibrate the model. *
+
+
+15. Why is it important to have a unique model identifier for each model?
+*A. It's important because you want to be able to unequivacally identify the exact model you are referring to. descriptions may not be specific enough to avoid error. In highly regulated environments (apart from it being good practice), this may be a compulsory requirement*
+
+16. Why is it important to document the modelling rationale and approach?
+*A. It is important so those who were not involved with the project, can understand the reasons for the decisions and approach that were taken and have the opportunity to audit this. It gives a more rounded understanding of the drivers that the team were guided by and which affected the model that was produced. *
