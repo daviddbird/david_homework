@@ -1,0 +1,56 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+#2 Extensions
+Build a decision tree to model the likelihood of a sale being of an organic avocado.
+Use k-means clustering to investigate potential relationships between the year and the average avocado price.
+
+```{r}
+suppressPackageStartupMessages(library(tidyverse))
+suppressPackageStartupMessages(library(cluster))
+suppressPackageStartupMessages(library(factoextra))
+suppressPackageStartupMessages(library(dendextend))
+```
+
+```{r}
+#load dataset
+avocado_km <- avocado_tidy
+```
+
+```{r}
+glimpse(avocado_km)
+```
+
+```{r}
+library(fastDummies)
+```
+
+```{r}
+fastDummies::dummy_cols(avocado_km, select_columns = c("type", "region"), remove_first_dummy = TRUE)
+```
+```{r}
+avocado_km <- subset(avocado_km, select = -c(type, region))
+```
+
+```{r}
+glimpse(avocado_km)
+```
+
+```{r}
+scale(avocado_km)
+```
+
+```{r}
+diss_matrix <- dist(avocado_km, method = "euclidean")
+```
+
+```{r}
+clusters <- hclust(diss_matrix, method = "complete")
+```
+
+```{r}
+plot(clusters, cex = 0.6, hang = -1)
+```
+

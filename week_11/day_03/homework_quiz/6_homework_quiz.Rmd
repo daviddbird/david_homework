@@ -17,7 +17,7 @@ the model too complex**
 **A. When looking at adjusted r-squared thw higher score should be the better one so the first model should be selected.**
 
 4. I have a model with the following errors: RMSE error on test set: 10.3, RMSE error on training data: 10.4. Do you think this model is over-fitting?
-**A. A lower RMSE is best - however the error will always be greater on the test data as the model will not have seen that data before. So not sure why the error should be lower on the test set? **
+**A. A lower RMSE is best - however the error will always be greater on the test data as the model will not have seen that data before. So not sure why the error should be lower on the test set? ** No the model is unlikely to be overfitting.
 
 5. How does k-fold validation work?
 **A. When using this type of validation, you normally pick a k value - usually 10 ( this is the number of data folds / or sections that your data is split into). A model is then made 10 times, each time we hold out one of the folds as the test set and train the data on the other 9 folds. Once the process is finished, we can average the error across all the test folds. This gives an accurate measure of model performance. It can be slow to run if you have a large dataset, or a computationally intensive model.**
@@ -45,7 +45,7 @@ the model too complex**
 
 12. Above what PSI value might we need to start to consider rebuilding or recalibrating the model
 *A. When the PSI is > 0.25*
-
+ when above 0.1
 
 13. What are the common errors that can crop up when implementing a model?
 *A  Find that the model dosen't address the root cause, only the symptioms of the problem. Can find the model is too difficult to implement.Are there policy rules which crop up which may force a human decision to be made. Business may decide to use a model for a purpose it was not design for. *

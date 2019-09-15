@@ -1,0 +1,28 @@
+---
+title: "Weekend Homework - Model Building"
+author: "Colin Farquhar"
+date: "12/09/2019"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+    css: "../../../template_files/styles.css"
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.align = 'center')
+```
+
+# MVP
+
+We've looked at a few different ways in which we can build models this week, including how to prepare them properly. This weekend we'll build a multiple linear regression model on a dataset which will need some preparation. The data has come from [Kaggle](https://www.kaggle.com/neuromusic/avocado-prices) and can be found in the data folder.
+
+We want to model avocado sales. You'll need to identify the target variable and use the tools we've worked with this week in order to prepare your dataset and find appropriate predictors. Once you've built your model use the validation techniques discussed on Wednesday to evaluate it.
+
+# Extensions
+
+* Build a decision tree to model the likelihood of a sale being of an organic avocado.
+* Use k-means clustering to investigate potential relationships between the year and the average avocado price.

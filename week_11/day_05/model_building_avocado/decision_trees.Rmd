@@ -1,0 +1,159 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+#2 Extensions
+Build a decision tree to model the likelihood of a sale being of an organic avocado.
+Use k-means clustering to investigate potential relationships between the year and the average avocado price.
+
+```{r}
+suppressPackageStartupMessages(library(rpart))
+library(rpart.plot)
+library(dplyr)
+```
+
+```{r}
+# load in the data
+avocado_dt <- avocado_tidy
+```
+
+```{r}
+head(avocado_dt)
+```
+
+```{r}
+# we need to shuffle the data, which helps to ensure we are selecting random training and test sets
+shuffle_index <- sample(1:nrow(avocado_dt))
+avocado_dt <- avocado_dt[shuffle_index, ]
+head(avocado_dt)
+```
+
+```{r}
+# with decision trees - it is not necessary to scale the data.
+# we still need to remove any NAs (none in this case)
+# plus do any variable reduction. We also need to do some
+# variable engineering, ensuring all our column are either
+# numeric type or factors.
+avocado_dt$year <- NULL
+avocado_dt$month <- NULL
+avocado_dt$week <- NULL
+# removed the date columns as the plot has too much information to plot
+glimpse(avocado_dt)
+```
+
+```{r}
+avocado_dt$region <- NULL
+# had to remove region as this also contained too much information to plot
+glimpse(avocado_dt)
+```
+
+
+```{r}
+# create training and test sets
+create_train_test <- function(data, size = 0.8, train = TRUE) {
+  n_row = nrow(data)
+  total_row = size * n_row
+  train_sample <- 1: total_row
+  if (train == TRUE) {
+    return (data[train_sample, ])
+  } else {
+    return (data[-train_sample, ])
+  }
+}
+
+avocado_dt_train <- create_train_test(avocado_dt, 0.8, train = TRUE)
+avocado_dt_test <- create_train_test(avocado_dt, 0.8, train = FALSE)
+```
+
+```{r}
+# checking that our test and training sets have similar proportions
+prop.table(table(avocado_dt_test$type))
+```
+
+```{r}
+prop.table(table(avocado_dt_train$type))
+```
+
+```{r}
+# It is unlikely that we'll get an exact match, but in general the gap
+# between the two will be smaller with karger datasets.
+avocado_dt_fit <- rpart(type ~ ., data = avocado_dt_train, method = "class")
+rpart.plot(avocado_dt_fit)
+```
+Not sure why there are organic in the conventional section of the tree and why there are conventional branches in the organis section......
+
+
+```{r}
+# Use k-means clustering to investigate potential relationships between the year and the average avocado price.
+# loading in the dataset
+avocado_kmc <- avocado_tidy
+```
+
+
+```{r}
+glimpse(avocado_kmc)
+```
+
+```{r}
+# we are interested in year so I'll remove the week and month columns
+avocado_kmc$week <- NULL
+avocado_kmc$month <- NULL
+```
+
+```{r}
+glimpse(avocado_kmc)
+```
+
+```{r}
+# as the distance calculations require numerical imputs, we need to remove the factor variables
+# from the dataset.
+avocado_kmc$type <- NULL
+avocado_kmc$region <- NULL
+glimpse(avocado_kmc)
+```
+```{r}
+# after selecting variables, we need to consider scaling. Good practive for k-means is to scale
+# our data such that the mean is zero and the standard deviation is one. We can check that is the case using summary
+summary(avocado_kmc)
+```
+
+```{r}
+# some large numbers - so we need to scale
+avocado_kmc <- avocado_kmc %>%
+  scale()
+```
+
+```{r}
+summary(avocado_kmc)
+```
+
+```{r}
+clustered_avocado_kmc <- kmeans(avocado_kmc, 4)
+clustered_avocado_kmc
+```
+
+```{r}
+set.seed(2345)
+library(animation)
+index <- c(1,8)
+kmeans.ani(avocado_kmc[,index], 4)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
