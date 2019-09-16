@@ -1,0 +1,190 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+Now we’ll go back to CI creation in the normal fashion. We’ll take the ames data from the CIs lab earlier today and regard it now as a sample, we won’t be drawing any smaller samples from within it. This is the usual situation in an analysis: you use all the data available to you!
+
+Load the data again and re-familiarise yourself with it
+
+```{r}
+library(readr)
+library(tidyverse)
+
+ames <- read_csv("ames.csv")
+
+glimpse(ames)
+```
+
+Investigate the distribution of Lot.Area. Is the distribution roughly normal? If not, what problems do you find?
+
+```{r}
+ames %>%
+  ggplot(aes(x = Lot.Area)) +
+  geom_histogram()
+```
+
+It is right skewed.
+
+Do you think any problematic features in the distribution of Lot.Area will cause any difficulties in estimating CIs or performing hypotheses tests using this variable?
+```{r}
+# first, write a helper function to compute finite population correction
+finite_correction <- function(n, N){
+  return(sqrt((N-n)/(N-1)))
+}
+
+standard_error_mean <- function(n, N, popn_stdev){
+  se_mean <- finite_correction(n, N) * popn_stdev / sqrt(n)
+  return(se_mean)
+}
+
+```
+
+
+Compute a 95%
+ CI for the mean Lot.Area of the sold houses.
+```{r}
+# get sigma from the population
+popn_sd_Lot.Area <- sd(ames$Lot.Area)
+
+# take a sample of 100 observations from the population 
+sample_100 <- ames %>%
+  sample_n(100)
+
+# point estimate of mean tenure from the sample
+meanLot.Area_sample100 <- mean(sample_100$Lot.Area)
+# standard error of mean tenure for a sample of size 100 (this uses population sigma)
+meanLot.Area_standarderror_sample100 <- standard_error_mean(n = 100, N = nrow(ames), popn_stdev = popn_sd_Lot.Area)
+
+# use quantile function to get lower and upper bounds of confidence interval
+lower_bound <- qnorm(0.025, mean = meanLot.Area_sample100, sd = meanLot.Area_standarderror_sample100)
+
+upper_bound <- qnorm(0.975, mean = meanLot.Area_sample100, sd = meanLot.Area_standarderror_sample100)
+
+library(fastGraph)
+shadeDist(xshade = c(lower_bound, upper_bound), lower.tail = FALSE, ddist = "dnorm", parm1 = meanLot.Area_sample100 , parm2 = meanLot.Area_standarderror_sample100, xlab = "meanLot.Area")
+```
+
+```{r}
+standard_error = popn_sd_Lot.Area / sqrt(100)
+margin_of_error = 1.96 * standard_error
+
+lower_bound = meanLot.Area_sample100 - margin_of_error
+upper_bound = meanLot.Area_sample100 + margin_of_error
+
+shadeDist(xshade = c(lower_bound, upper_bound), lower.tail = FALSE, ddist = "dnorm", parm1 = meanLot.Area_sample100 , parm2 = standard_error, xlab = "meanLot.Area")
+```
+
+
+
+You would like to know the mean Lot.Area of the sold houses with higher confidence. Calculate the 99%
+ CI for this variable. Is it narrower or broader than the 95% - *Broader*
+ CI? Does that make sense?
+```{r}
+# get sigma from the population
+popn_sd_Lot.Area <- sd(ames$Lot.Area)
+
+# take a sample of 100 observations from the population 
+sample_100 <- ames %>%
+  sample_n(100)
+
+# point estimate of mean tenure from the sample
+meanLot.Area_sample100 <- mean(sample_100$Lot.Area)
+# standard error of mean tenure for a sample of size 100 (this uses population sigma)
+meanLot.Area_standarderror_sample100 <- standard_error_mean(n = 100, N = nrow(ames), popn_stdev = popn_sd_Lot.Area)
+
+# use quantile function to get lower and upper bounds of confidence interval
+lower_bound <- qnorm(0.005, mean = meanLot.Area_sample100, sd = meanLot.Area_standarderror_sample100)
+
+upper_bound <- qnorm(0.995, mean = meanLot.Area_sample100, sd = meanLot.Area_standarderror_sample100)
+
+library(fastGraph)
+shadeDist(xshade = c(lower_bound, upper_bound), lower.tail = FALSE, ddist = "dnorm", parm1 = meanLot.Area_sample100 , parm2 = meanLot.Area_standarderror_sample100, xlab = "meanLot.Area")
+```
+
+
+```{r}
+margin_of_error = 2.576 * standard_error
+
+lower_bound = meanLot.Area_sample100 - margin_of_error
+upper_bound = meanLot.Area_sample100 + margin_of_error
+
+shadeDist(xshade = c(lower_bound, upper_bound), lower.tail = FALSE, ddist = "dnorm", parm1 = meanLot.Area_sample100 , parm2 = standard_error, xlab = "meanLot.Area")
+```
+
+
+
+
+Can you split out and show separate 99%
+ CIs for mean Lot.Area grouped by House.Style? Do you see any CIs you might not trust?
+```{r}
+
+library(rcompanion)
+# here the formula object basically says: 'Lo.Area varying with House.Style'
+
+groupwiseMean(Lot.Area ~ House.Style, data = sample_100, conf = 0.99)
+
+# not sure I trust the last figure's confidence range of  -176000 to 197000
+# this is because there are only two of this type
+```
+ 
+Calculate a 99%
+ CI for the proportion of houses in the data built before 1890. Try using the wilson and wald methods. How different are the bounds of the CIs given by the two methods?
+```{r}
+
+#sample_100[sample_100$Year.Built < "1900", ]
+
+obs <- c(2, 98)
+obs
+
+total <- sum(obs)
+total
+```
+```{r}
+sample_100
+```
+
+
+```{r}
+library(DescTools)
+BinomCI(x = obs, n = total, conf.level = 0.99, method = "wilson")
+```
+
+```{r}
+library(DescTools)
+BinomCI(x = obs, n = total, conf.level = 0.99, method = "wald")
+```
+
+
+[Harder] do a bit of reading on the Wald and Wilson methods. Why do you think the bounds produced by the two methods are more significantly different when the proportion is closer to 0? Which method would you choose for the ‘proportion before 1890’ CI?
+```{r}
+#wilson method - This interval has good properties even for a small number of trials and/or an extreme probability.
+
+#wald - An advantage of the Wald test over the other two is that it only requires the estimation of the unrestricted model, which lowers the computational burden as compared to the likelihood-ratio test. However, a major disadvantage is that (in finite samples) it is not invariant to changes in the representation of the null hypothesis; in other words, algebraically equivalent expressions of non-linear parameter restriction can lead to different values of the test statistic.[5][6] That is because the Wald statistic is derived from a Taylor expansion,[7] and different ways of writing equivalent nonlinear expressions lead to nontrivial differences in the corresponding Taylor coefficients.[8] Another aberration, known as the Hauck–Donner effect, can occur in binomial models when the estimated (unconstrained) parameter is close to the boundary of the parameter space—for instance a fitted probability being extremely close to zero or one—which results in the Wald test no longer monotonically increasing in the distance between the unconstrained and constraint parameter.[9]
+
+#I don't pretend to understand this......
+```
+
+Calculate 95%
+ CIs for the proportion of total house sales made up by each level of House.Style 
+ in the data
+```{r}
+ames %>%
+  select(House.Style, SalePrice) %>%
+  group_by(House.Style) %>%
+  summarise(count = n(), Sales = sum(SalePrice))
+  
+```
+
+```{r}
+obs2 <- c(314, 19, 1481, 8, 24, 873, 83, 128)
+
+total2 <- sum(obs2)
+total2
+```
+
+```{r}
+BinomCI(x = obs2, n = total2, conf.level = 0.95, method = "wilson")
+```
+
