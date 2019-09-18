@@ -1,0 +1,177 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(zoo)
+library(xts)
+library(lubridate)
+library(tseries)
+library(forecast)
+library(tibbletime)
+library(timetk)
+library(tidyverse)
+```
+
+1. Load in the sunspots data and check it is a time series. Get the start, end, periodicity, frequency and cycle information. Get the start and end times, periodicity, frequency, and anything else you need to understand your data.
+```{r}
+# load & investigating the dataset
+data(sunspots)
+glimpse(sunspots)
+class(sunspots)
+
+# start and end times
+start(sunspots)
+end(sunspots)
+
+# frequency
+frequency(sunspots)
+
+sunspots_ts <- ts(sunspots, frequency = 12, start(c(1749,1)))
+
+# plotting the data
+plot(sunspots)
+
+# decompose the data
+sunspots_tsc <- decompose(sunspots, type = "additive") # additive
+plot(sunspots_tsc)
+```
+
+2. Write an initial description of your data. Give enough detail that you could use it as a description for a data dictionary or for another analyst to follow.
+```{r}
+# Monthly Sunspot numbers (monthly mean relative sunspot numbers) from 1749 - 1893
+# There appears to be regular seasonal patterns. There is no upwards trend, rather
+# there is a regular variability of activity. Perhaps viewing this over an
+# even longer time period would releal further patterns.
+```
+
+3. Calculate the rolling average of your sunspots data, and plot it. Hint: You’ll need to choose the window you want to average over to make sure it’s representative of this particular time series.
+```{r}
+# calculate a moving average
+rolling_average <- rollapply(sunspots_ts, width = 48, 
+                             align = "right", FUN = mean, na.rm = TRUE)
+
+plot(rolling_average)
+
+sunspot_rolling <- cbind(sunspots_ts, rolling_average)
+plot(sunspot_rolling)
+```
+
+4. Decompose the time series and look at the different components. Make sure you use the right type of decomposition. Then take a look at your different components. What does it all tell you? Hint: you might need to subset some of your data in order to see patterns more clearly
+```{r}
+# decompose the data
+sunspots_tsc$seasonal
+```
+
+```{r}
+# decompose the data
+sunspots_tsc$trend
+```
+
+```{r}
+# decompose the data
+sunspots_tsc$random
+```
+
+```{r}
+plot(sunspots_tsc$seasonal[1:26], x = 1:26, type = "l", col = "blue", xlab = "year", ylab = "sunspots")
+```
+
+```{r}
+plot(sunspots_tsc$seasonal[1:13], x = 1:13, type = "l", col = "blue", xlab = "year", ylab = "sunspots")
+```
+
+
+5. Check if your data is stationary using the appropriate plots. Do you have stationary data? If no, make the data stationary.
+```{r}
+plot(sunspots_ts)
+```
+
+```{r}
+cycle(sunspots)
+plot(aggregate(sunspots, FUN = mean))
+boxplot(sunspots~cycle(sunspots))
+#detrending and diff
+sunspots_log <- log(sunspots_ts)
+plot(sunspots_log)
+sunspots_detrend <- diff(sunspots_log)
+plot(sunspots_detrend)
+
+```
+```{r}
+# now stationary?
+library(tseries)
+# do the augmented dickey-fuller test
+adf.test(sunspots, alternative = "stationary", k = 0)
+```
+
+
+6. Now we have our data, choose your ARIMA model parameters. Create ACF and PACF plots to check, and write a summary of what you have found.
+```{r}
+arimaAP <- auto.arima(sunspots, approximation = FALSE)
+arimaAP
+```
+```{r}
+# p, d, q
+
+# p = 2 (auto regression)
+# d = 1 (differencing parameter)
+# q = 2 (moving avg)
+
+#ACF plot
+acf(sunspots)
+
+#PACF plot
+pacf(sunspots)
+```
+
+7. Fit an ARIMA model that predicts the sunspots for the next 20 years. Plot the data, and have a look at your forecast. Does it look like a good forecast or good fit?
+```{r}
+# fit using the model parameters calculated from before
+fit <- arima(sunspots, c(2, 1, 2))
+fit
+```
+
+```{r}
+# check the residuals
+checkresiduals(fit)
+```
+
+```{r}
+# use the predict function to predict 20 years ahead (20 * 12 months)
+pred <- predict(fit, n.ahead = 20*12)
+
+# plot the sunspot data, along with the redicted data
+ts.plot(sunspots, pred$pred, log = "y", lty = c(1,3))
+```
+
+
+
+8. Problem solving: Your model isn’t predicting that well. What are some reasons you can think for this?
+```{r}
+# I've made a mistake somewhere in the process?
+```
+
+9. Problem solving:
+
+In the present case, sunspots have a cycle of length 11 years. To know this, you’d have to know something about sunspots. You can find this here. The sunspots data are a monthly time series. Thus, the implicit seasonality of sunspots is 12 (months), not 11×12=132 (months).
+
+ARIMA and auto.arima() were never built to automatically detect a seasonal cycle whose length is not pre-specified. It is not overly surprising it does not see that it should do 11 seasonal differences to model a seasonality that repeats every 11 cycles of its prespecified frequency.
+
+So, the first order of business would be to specify that seasonal cycles are indeed of length 132 (i.e. 1112). Then you’ll need to use this seasonally adjusted data in your model, and include a seasonality parameter into your arima model (try ?auto.arima) to show how to do this. Hint, it involves setting your D parameter = 1*. Then you can plot your data and predict the next 20 years. Is this a better fit?
+
+```{r}
+arimaAP <- auto.arima(sunspots, approximation = FALSE)
+arimaAP
+```
+
+```{r}
+myts <- ts(sunspots, start=c(start(sunspots), 1), end=c(end(sunspots), 1112), frequency= frequency(sunspots))
+auto.arima(myts, seasonal = T)
+```
+
+
+```{r}
+
+```

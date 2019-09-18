@@ -28,6 +28,15 @@ ames %>%
 It is right skewed.
 
 Do you think any problematic features in the distribution of Lot.Area will cause any difficulties in estimating CIs or performing hypotheses tests using this variable?
+
+We could use bootstrapping
+resample all observations
+sample with replacement
+and if it looks normal you are ok.
+do this about 10,000 times
+sample_n(size of sample, replace = TRUE)
+investigate this.
+
 ```{r}
 # first, write a helper function to compute finite population correction
 finite_correction <- function(n, N){
@@ -155,7 +164,8 @@ BinomCI(x = obs, n = total, conf.level = 0.99, method = "wilson")
 library(DescTools)
 BinomCI(x = obs, n = total, conf.level = 0.99, method = "wald")
 ```
-
+Wald is normal. Wilson method is suitable top use all the time.
+Don't use wald method when you have a proportion near to 0 or 1 etc.
 
 [Harder] do a bit of reading on the Wald and Wilson methods. Why do you think the bounds produced by the two methods are more significantly different when the proportion is closer to 0? Which method would you choose for the ‘proportion before 1890’ CI?
 ```{r}
