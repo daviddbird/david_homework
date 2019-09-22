@@ -49,7 +49,7 @@ plot(sunspots_tsc)
 3. Calculate the rolling average of your sunspots data, and plot it. Hint: You’ll need to choose the window you want to average over to make sure it’s representative of this particular time series.
 ```{r}
 # calculate a moving average
-rolling_average <- rollapply(sunspots_ts, width = 48, 
+rolling_average <- rollapply(sunspots_ts, width = 120, 
                              align = "right", FUN = mean, na.rm = TRUE)
 
 plot(rolling_average)

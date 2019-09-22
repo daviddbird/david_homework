@@ -347,6 +347,10 @@ model5 <- train(log(averageprice) ~ type + year + region + week + month,
 
 mean(model5$resample$RMSE)
 mean(model5$resample$Rsquared)
+
+model5 <- lm(log(averageprice) ~ type + year + region + week + month, 
+                data = avocado_tidy)
+
 ```
 ```{r}
 model5$resample
@@ -398,6 +402,9 @@ model9 <- train(log(averageprice) ~ type + year + region + week + month + large.
 
 mean(model9$resample$RMSE)
 mean(model9$resample$Rsquared)
+
+model9 <- lm(log(averageprice) ~ type + year + region + week + month + large.bags + region:type + region:week, 
+                data = avocado_tidy)
 ```
 
 ```{r}
@@ -420,5 +427,23 @@ model_best <- lm(log(averageprice) ~ type + year + region + week + month + large
 
 ```{r}
 broom::glance(model_best)
+```
+
+```{r}
+broom::glance(model5)
+```
+
+```{r}
+library(glmulti)
+glmulti_fit <- glmulti(log(averageprice) ~ ., 
+                       data = avocado_tidy,
+                       level = 1,
+                       minsize = 0,
+                       maxsize = -1,
+                       marginality = TRUE,
+                       method = "g",
+                       crit = bic,
+                       confsetsize = 50,
+                       fitfunction = lm)
 ```
 
